@@ -1,0 +1,91 @@
+<div class="page-container">
+  <div class="form-card">
+    <header class="form-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+      </button>
+      <h1 class="title">Create User</h1>
+      <p class="subtitle">Register a new Admin or Partner user</p>
+    </header>
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (submit)="onSubmit()" class="create-user-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="John"
+            [class.invalid]="form.get('firstName')?.invalid && form.get('firstName')?.touched"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            placeholder="Doe"
+            [class.invalid]="form.get('lastName')?.invalid && form.get('lastName')?.touched"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="name@company.com"
+          [class.invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          [class.invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <div class="select-wrapper">
+          <select id="role" formControlName="role">
+            <option value="Partner">Partner</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading() || form.invalid">
+        @if (isLoading()) {
+          <span class="spinner"></span>
+        } @else {
+          Create User
+        }
+      </button>
+    </form>
+  </div>
+</div>

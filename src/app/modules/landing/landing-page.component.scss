@@ -28,6 +28,31 @@
   svg { width: 28px; height: 28px; color: var(--brand-green); }
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.create-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+
+  svg { width: 18px; height: 18px; }
+  &:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(8, 184, 128, 0.2); }
+  &:active { transform: translateY(0); }
+}
+
 .logout-btn {
   display: flex;
   align-items: center;
