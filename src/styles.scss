@@ -14,9 +14,14 @@
   --bg-glass: rgba(30, 41, 59, 0.85);
   --border-glass: rgba(255, 255, 255, 0.08);
 
+  --accent-red: var(--brand-red);
+
   --accent-primary: var(--brand-green);
   --accent-secondary: var(--brand-cyan);
   --accent-gradient: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-cyan) 100%);
+  --accent-red-gradient: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-pink) 100%);
+  --accent-yellow-gradient: linear-gradient(135deg, var(--brand-yellow) 0%, var(--brand-pink) 100%);
+  --accent-purple-gradient: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-pink) 100%);
   --accent-glow: rgba(8, 184, 128, 0.12);
 
   --text-primary: #f1f5f9;
@@ -32,7 +37,8 @@
   --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-html, body {
+html,
+body {
   min-height: 100%;
   width: 100%;
   font-family: var(--font-family);

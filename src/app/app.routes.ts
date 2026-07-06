@@ -19,5 +19,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/create-user').then((m) => m.CreateUserComponent),
     canActivate: [authGuard, adminGuard],
   },
+  {
+    path: 'create-product',
+    loadComponent: () => import('./components/create-product').then((m) => m.CreateProductComponent),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

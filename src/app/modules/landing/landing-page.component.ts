@@ -38,4 +38,8 @@ export class LandingPageComponent implements OnInit {
   protected navigateToCreateUser(): void {
     this.router.navigate(['/create-user']);
   }
+
+  protected navigateToCreateProduct(): void {
+    this.router.navigate(['/create-product']);
+  }
 }

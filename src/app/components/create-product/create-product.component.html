@@ -1,0 +1,186 @@
+<div class="page-container">
+  <div class="form-card">
+    <header class="form-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+      </button>
+      <h1 class="title">Create Product</h1>
+      <p class="subtitle">Register a new toy product with connected parts</p>
+    </header>
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (submit)="onSubmit()" class="create-product-form">
+      <div class="form-group">
+        <label for="title">Product Title</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="e.g. Wooden Train Set"
+          [class.invalid]="form.get('title')?.invalid && form.get('title')?.touched"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="subtitle">Subtitle / Short Tagline</label>
+        <input
+          id="subtitle"
+          type="text"
+          formControlName="subtitle"
+          placeholder="e.g. Eco-friendly classic toy"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Detailed Description</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Describe materials, sizing, recommendations..."
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Category</label>
+          <input
+            id="category"
+            type="text"
+            formControlName="category"
+            placeholder="e.g. Wooden Toys"
+            [class.invalid]="form.get('category')?.invalid && form.get('category')?.touched"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="subcategory">Subcategory</label>
+          <input
+            id="subcategory"
+            type="text"
+            formControlName="subcategory"
+            placeholder="e.g. Vehicles"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price ($)</label>
+        <input
+          id="price"
+          type="number"
+          step="0.01"
+          formControlName="price"
+          placeholder="29.99"
+          [class.invalid]="form.get('price')?.invalid && form.get('price')?.touched"
+        />
+      </div>
+
+      <!-- Dynamic Image URLs list -->
+      <div class="form-group">
+        <label>Image URLs</label>
+        <div class="image-inputs-list">
+          @for (ctrl of imageUrlsArray.controls; track $index) {
+            <div class="image-input-row">
+              <input
+                type="url"
+                [formControl]="ctrl"
+                placeholder="https://example.com/image.jpg"
+              />
+              <button
+                type="button"
+                class="remove-image-btn"
+                (click)="removeImageUrl($index)"
+                aria-label="Remove image URL"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+        <button type="button" class="add-image-btn" (click)="addImageUrl()">
+          + Add Image URL
+        </button>
+      </div>
+
+      <!-- Custom Paginated Parts Multi-Select list -->
+      <div class="form-group">
+        <label>Connect Parts</label>
+        <div class="parts-selector-container">
+          <div class="parts-search-bar">
+            <input
+              type="text"
+              placeholder="Search parts by title..."
+              (input)="onPartsSearch($event)"
+            />
+          </div>
+
+          <div class="parts-list">
+            @for (part of parts(); track part.part_id) {
+              <div
+                class="part-item"
+                [class.selected]="form.controls.partIds.value.includes(part.part_id)"
+                (click)="togglePartSelection(part.part_id)"
+              >
+                <div class="part-checkbox">
+                  @if (form.controls.partIds.value.includes(part.part_id)) {
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" />
+                    </svg>
+                  }
+                </div>
+                <div class="part-details">
+                  <span class="part-title">{{ part.title }}</span>
+                  @if (part.description) {
+                    <span class="part-desc">{{ part.description }}</span>
+                  }
+                </div>
+                <span class="part-price">${{ part.price.toFixed(2) }}</span>
+              </div>
+            } @empty {
+              <div class="no-parts">No parts found</div>
+            }
+
+            @if (hasMoreParts()) {
+              <button
+                type="button"
+                class="load-more-parts-btn"
+                (click)="loadMoreParts($event)"
+                [disabled]="isPartsLoading()"
+              >
+                @if (isPartsLoading()) {
+                  Loading...
+                } @else {
+                  Load More Parts
+                }
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading() || form.invalid">
+        @if (isLoading()) {
+          <span class="spinner"></span>
+        } @else {
+          Create Product
+        }
+      </button>
+    </form>
+  </div>
+</div>
