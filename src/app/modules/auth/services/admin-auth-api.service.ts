@@ -49,4 +49,17 @@ export class AdminAuthApiService {
       throw err;
     }
   }
+
+  async refreshAccessToken(): Promise<LoginResponse> {
+    try {
+      return await firstValueFrom(
+        this.http.post<LoginResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
+      );
+    } catch (err) {
+      if (err instanceof HttpErrorResponse) {
+        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Refresh failed');
+      }
+      throw err;
+    }
+  }
 }
