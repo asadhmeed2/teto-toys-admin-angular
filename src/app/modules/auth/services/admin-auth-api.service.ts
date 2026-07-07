@@ -34,4 +34,19 @@ export class AdminAuthApiService {
       // best-effort
     }
   }
+
+  async me(token: string): Promise<any> {
+    try {
+      return await firstValueFrom(
+        this.http.get<any>(`${this.baseUrl}/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+    } catch (err) {
+      if (err instanceof HttpErrorResponse) {
+        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Validation failed');
+      }
+      throw err;
+    }
+  }
 }
