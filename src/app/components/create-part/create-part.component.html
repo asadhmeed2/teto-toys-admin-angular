@@ -1,0 +1,94 @@
+<div class="page-container">
+  <div class="form-card">
+    <header class="form-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+      </button>
+      <h1 class="title">Create Part</h1>
+      <p class="subtitle">Add a new part to be used in products</p>
+    </header>
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (submit)="onSubmit()" class="create-part-form">
+      <div class="form-group">
+        <label for="title">Part Title</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="e.g. Wooden Block A"
+          [class.invalid]="form.get('title')?.invalid && form.get('title')?.touched"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Detailed description of the part..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price ($)</label>
+        <input
+          id="price"
+          type="number"
+          step="0.01"
+          formControlName="price"
+          placeholder="0.00"
+          [class.invalid]="form.get('price')?.invalid && form.get('price')?.touched"
+        />
+      </div>
+
+      <div class="form-group imageUrls-section">
+        <div class="section-header">
+          <label>Image URLs</label>
+          <button type="button" class="add-url-btn" (click)="addImageUrlInput()">
+            + Add URL
+          </button>
+        </div>
+
+        <div formArrayName="imageUrls" class="urls-list">
+          @for (urlControl of imageUrlsArray.controls; track $index) {
+            <div class="url-input-row">
+              <input
+                [formControlName]="$index"
+                type="text"
+                placeholder="https://example.com/image.jpg"
+              />
+              <button type="button" class="remove-url-btn" (click)="removeImageUrlInput($index)" aria-label="Remove URL">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading() || form.invalid">
+        @if (isLoading()) {
+          <span class="spinner"></span>
+        } @else {
+          Create Part
+        }
+      </button>
+    </form>
+  </div>
+</div>

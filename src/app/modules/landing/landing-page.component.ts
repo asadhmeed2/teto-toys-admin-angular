@@ -42,4 +42,8 @@ export class LandingPageComponent implements OnInit {
   protected navigateToCreateProduct(): void {
     this.router.navigate(['/create-product']);
   }
+
+  protected navigateToCreatePart(): void {
+    this.router.navigate(['/create-part']);
+  }
 }
