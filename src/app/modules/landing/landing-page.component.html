@@ -7,38 +7,55 @@
       <span>TatoToys Admin</span>
     </div>
     <div class="header-actions">
-      @if (permissionsService.permissions()?.userCreation) {
-        <button id="create-user-btn" class="create-user-btn" (click)="navigateToCreateUser()">
+      <div class="menu-container">
+        <button class="menu-trigger-btn" (click)="toggleMenu()" aria-label="Toggle creation menu">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Create User
+          <span>Create New</span>
+          <svg class="chevron-icon" [class.open]="isMenuOpen()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
         </button>
-      }
-      <button id="create-product-btn" class="create-product-btn" (click)="navigateToCreateProduct()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Create Product
-      </button>
-      <button id="create-part-btn" class="create-part-btn" (click)="navigateToCreatePart()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Create Part
-      </button>
-      <button id="create-category-btn" class="create-category-btn" (click)="navigateToCreateCategory()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Create Category
-      </button>
-      <button id="create-subcategory-btn" class="create-subcategory-btn" (click)="navigateToCreateSubcategory()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Create Subcategory
-      </button>
+
+        @if (isMenuOpen()) {
+          <div class="dropdown-menu">
+            @if (permissionsService.permissions()?.userCreation) {
+              <button id="create-user-btn" class="dropdown-item" (click)="navigateToCreateUser(); toggleMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                </svg>
+                <span>Create User</span>
+              </button>
+            }
+            <button id="create-product-btn" class="dropdown-item" (click)="navigateToCreateProduct(); toggleMenu()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Create Product</span>
+            </button>
+            <button id="create-part-btn" class="dropdown-item" (click)="navigateToCreatePart(); toggleMenu()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Create Part</span>
+            </button>
+            <button id="create-category-btn" class="dropdown-item" (click)="navigateToCreateCategory(); toggleMenu()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Create Category</span>
+            </button>
+            <button id="create-subcategory-btn" class="dropdown-item" (click)="navigateToCreateSubcategory(); toggleMenu()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Create Subcategory</span>
+            </button>
+          </div>
+        }
+      </div>
+
       <button id="admin-logout-btn" class="logout-btn" (click)="logout()" [disabled]="isLoggingOut()">
         @if (isLoggingOut()) {
           <span class="spinner"></span>

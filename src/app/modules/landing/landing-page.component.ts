@@ -11,7 +11,12 @@ import { AdminAuthApiService } from '../auth/services/admin-auth-api.service';
 })
 export class LandingPageComponent implements OnInit {
   protected readonly isLoggingOut = signal(false);
+  protected readonly isMenuOpen = signal(false);
   protected readonly permissionsService = inject(PermissionsService);
+
+  protected toggleMenu(): void {
+    this.isMenuOpen.update(open => !open);
+  }
 
   private readonly authService = inject(AuthService);
   private readonly apiService = inject(AdminAuthApiService);

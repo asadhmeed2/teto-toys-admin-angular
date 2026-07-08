@@ -5,12 +5,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CreateProductApiService, PartDto } from './services/create-product-api.service';
 import { Category } from '../create-category/services/create-category-api.service';
 import { Subcategory } from '../create-subcategory/services/create-subcategory-api.service';
-import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-create-product',
   standalone: true,
-  imports: [ReactiveFormsModule, JsonPipe],
+  imports: [ReactiveFormsModule],
   providers: [CreateProductApiService],
   templateUrl: './create-product.component.html',
   styleUrl: './create-product.component.scss',
