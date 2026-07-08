@@ -5,11 +5,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CreateProductApiService, PartDto } from './services/create-product-api.service';
 import { Category } from '../create-category/services/create-category-api.service';
 import { Subcategory } from '../create-subcategory/services/create-subcategory-api.service';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-create-product',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, JsonPipe],
   providers: [CreateProductApiService],
   templateUrl: './create-product.component.html',
   styleUrl: './create-product.component.scss',
@@ -40,7 +41,7 @@ export class CreateProductComponent implements OnInit {
   protected readonly filteredSubcategories = computed(() => {
     const catId = this.selectedCategory();
     if (catId === null) return [];
-    return this.subcategories().filter(sub => sub.category_id === catId);
+    return this.subcategories().filter(sub => sub.category_id === +catId);
   });
 
   protected readonly isLoading = signal(false);
