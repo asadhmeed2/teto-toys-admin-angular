@@ -29,5 +29,15 @@ export const routes: Routes = [
     loadComponent: () => import('./components/create-part').then((m) => m.CreatePartComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'create-category',
+    loadComponent: () => import('./components/create-category').then((m) => m.CreateCategoryComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'create-subcategory',
+    loadComponent: () => import('./components/create-subcategory').then((m) => m.CreateSubcategoryComponent),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

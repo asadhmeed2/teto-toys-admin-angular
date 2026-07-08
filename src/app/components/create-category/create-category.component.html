@@ -1,0 +1,50 @@
+<div class="page-container">
+  <div class="form-card">
+    <header class="form-header">
+      <button class="back-btn" routerLink="/landing" title="Back to Dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+      <h1 class="title">Create Category</h1>
+      <p class="subtitle">Add a new product category classifier</p>
+    </header>
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="create-category-form">
+      <div class="form-group">
+        <label for="name">Category Name</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="e.g. Action Figures, Building Blocks"
+          [class.invalid]="categoryForm.controls.name.invalid && categoryForm.controls.name.touched"
+        />
+        @if (categoryForm.controls.name.invalid && categoryForm.controls.name.touched) {
+          <span class="error-text">Please enter a valid category name (2-100 characters).</span>
+        }
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading() || categoryForm.invalid">
+        @if (isLoading()) {
+          <div class="spinner"></div>
+        } @else {
+          <span>Create Category</span>
+        }
+      </button>
+    </form>
+  </div>
+</div>

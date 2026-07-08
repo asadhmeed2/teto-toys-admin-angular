@@ -46,4 +46,12 @@ export class LandingPageComponent implements OnInit {
   protected navigateToCreatePart(): void {
     this.router.navigate(['/create-part']);
   }
+
+  protected navigateToCreateCategory(): void {
+    this.router.navigate(['/create-category']);
+  }
+
+  protected navigateToCreateSubcategory(): void {
+    this.router.navigate(['/create-subcategory']);
+  }
 }
