@@ -15,8 +15,7 @@ export class CreateSubcategoryComponent implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly subcategoryForm = new FormGroup({
-    categoryId: new FormControl('', {
-      nonNullable: true,
+    categoryId: new FormControl<number | null>(null, {
       validators: [Validators.required],
     }),
     name: new FormControl('', {
@@ -58,9 +57,15 @@ export class CreateSubcategoryComponent implements OnInit {
     const categoryId = this.subcategoryForm.controls.categoryId.value;
     const name = this.subcategoryForm.controls.name.value;
 
+    if (categoryId === null) {
+      this.errorMessage.set('Please select a valid parent category.');
+      this.isLoading.set(false);
+      return;
+    }
+
     try {
       const result = await this.apiService.createSubcategory(categoryId, name);
-      this.successMessage.set(`Subcategory "${result.name}" created successfully under category "${categoryId}"!`);
+      this.successMessage.set(`Subcategory "${result.name}" created successfully under category ID "${categoryId}"!`);
       this.subcategoryForm.reset();
 
       setTimeout(() => {

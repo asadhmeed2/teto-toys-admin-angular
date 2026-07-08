@@ -3,8 +3,9 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 export interface Category {
-  category_id: string;
+  id: number;
   name: string;
+  slug: string;
 }
 
 @Injectable({

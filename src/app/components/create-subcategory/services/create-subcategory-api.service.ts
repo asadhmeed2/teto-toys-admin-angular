@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { Category } from '../../create-category/services/create-category-api.service';
 
 export interface Subcategory {
-  subcategory_id: string;
-  category_id: string;
+  id: number;
+  category_id: number;
   name: string;
 }
 
@@ -30,7 +30,7 @@ export class CreateSubcategoryApiService {
   }
 
   // ponytail: create subcategory using HttpClient and async/await
-  async createSubcategory(categoryId: string, name: string): Promise<Subcategory> {
+  async createSubcategory(categoryId: number, name: string): Promise<Subcategory> {
     try {
       const url = `${this.baseUrl}/subcategories`;
       return await firstValueFrom(

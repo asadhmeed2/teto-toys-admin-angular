@@ -1,7 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CreateProductApiService, PartDto } from './services/create-product-api.service';
+import { Category } from '../create-category/services/create-category-api.service';
+import { Subcategory } from '../create-subcategory/services/create-subcategory-api.service';
 
 @Component({
   selector: 'app-create-product',
@@ -16,8 +19,8 @@ export class CreateProductComponent implements OnInit {
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     subtitle: new FormControl('', { nonNullable: true }),
     description: new FormControl('', { nonNullable: true }),
-    category: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    subcategory: new FormControl('', { nonNullable: true }),
+    category: new FormControl<number | null>(null, { validators: [Validators.required] }),
+    subcategory: new FormControl<number | null>(null),
     price: new FormControl<number | null>(null, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
     imageUrls: new FormArray<FormControl<string>>([]),
     partIds: new FormControl<string[]>([], { nonNullable: true }),
@@ -29,17 +32,38 @@ export class CreateProductComponent implements OnInit {
   protected readonly partsSearch = signal('');
   protected readonly hasMoreParts = signal(true);
 
+  protected readonly categories = signal<Category[]>([]);
+  protected readonly subcategories = signal<Subcategory[]>([]);
+  protected readonly selectedCategory = signal<number | null>(null);
+
+  // ponytail: computed filtering subcategories by selected category ID
+  protected readonly filteredSubcategories = computed(() => {
+    const catId = this.selectedCategory();
+    if (catId === null) return [];
+    return this.subcategories().filter(sub => sub.category_id === catId);
+  });
+
   protected readonly isLoading = signal(false);
   protected readonly successMessage = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
 
   private readonly apiService = inject(CreateProductApiService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.loadParts(true);
+    this.loadMetadata();
     // ponytail: add a default empty image URL input
     this.addImageUrl();
+
+    // ponytail: reset subcategory when category changes and track selection
+    this.form.controls.category.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(val => {
+        this.selectedCategory.set(val);
+        this.form.controls.subcategory.setValue(null);
+      });
   }
 
   get imageUrlsArray(): FormArray<FormControl<string>> {
@@ -54,6 +78,20 @@ export class CreateProductComponent implements OnInit {
     this.imageUrlsArray.removeAt(index);
     if (this.imageUrlsArray.length === 0) {
       this.addImageUrl();
+    }
+  }
+
+  // ponytail: fetch categories and subcategories on initialization
+  private async loadMetadata(): Promise<void> {
+    try {
+      const [catsRes, subcatsRes] = await Promise.all([
+        this.apiService.getCategories(),
+        this.apiService.getSubcategories()
+      ]);
+      this.categories.set(catsRes.items || []);
+      this.subcategories.set(subcatsRes.items || []);
+    } catch (err: any) {
+      this.errorMessage.set(err.message || 'Failed to load categories/subcategories.');
     }
   }
 
@@ -110,16 +148,22 @@ export class CreateProductComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
+    const val = this.form.getRawValue();
+    if (val.category === null) {
+      this.errorMessage.set('Please select a category.');
+      this.isLoading.set(false);
+      return;
+    }
+
     try {
-      const val = this.form.getRawValue();
       const filteredImages = val.imageUrls.filter(url => !!url.trim());
 
       await this.apiService.createProduct({
         title: val.title.trim(),
         subtitle: val.subtitle.trim() || undefined,
         description: val.description.trim() || undefined,
-        category: val.category.trim(),
-        subcategory: val.subcategory.trim() || undefined,
+        category: val.category,
+        subcategory: val.subcategory || undefined,
         price: val.price ?? 0,
         part_ids: val.partIds,
         image_urls: filteredImages
@@ -129,6 +173,7 @@ export class CreateProductComponent implements OnInit {
       this.form.reset();
       this.imageUrlsArray.clear();
       this.addImageUrl();
+      this.selectedCategory.set(null);
     } catch (err: any) {
       this.errorMessage.set(err.message || 'An error occurred during product creation.');
     } finally {

@@ -32,8 +32,8 @@
           [class.invalid]="subcategoryForm.controls.categoryId.invalid && subcategoryForm.controls.categoryId.touched"
         >
           <option value="" disabled>-- Select Parent Category --</option>
-          @for (category of categories(); track category.category_id) {
-            <option [value]="category.category_id">{{ category.name }}</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.id">{{ category.name }}</option>
           }
         </select>
         @if (subcategoryForm.controls.categoryId.invalid && subcategoryForm.controls.categoryId.touched) {
