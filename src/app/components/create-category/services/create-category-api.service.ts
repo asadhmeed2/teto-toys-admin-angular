@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { parseHttpError } from '../../../shared/utils/error';
 
 export interface Category {
   id: number;
@@ -22,10 +23,7 @@ export class CreateCategoryApiService {
         this.http.post<Category>(this.baseUrl, { name }, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to create category');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to create category');
     }
   }
 }

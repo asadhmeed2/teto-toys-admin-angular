@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SessionInactivityService } from './shared/services/session-inactivity.service';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +7,4 @@ import { SessionInactivityService } from './shared/services/session-inactivity.s
   template: `<router-outlet />`,
   styles: [],
 })
-export class App {
-  private readonly inactivityService = inject(SessionInactivityService);
-}
+export class App {}

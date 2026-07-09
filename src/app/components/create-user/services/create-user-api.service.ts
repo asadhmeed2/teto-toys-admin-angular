@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { parseHttpError } from '../../../shared/utils/error';
 
 export interface CreateUserRequest {
   email: string;
@@ -30,10 +31,7 @@ export class CreateUserApiService {
         this.http.post<CreateUserResponse>(this.baseUrl, request, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to create user');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to create user');
     }
   }
 }

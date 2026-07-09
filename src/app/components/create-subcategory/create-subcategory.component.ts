@@ -69,7 +69,7 @@ export class CreateSubcategoryComponent implements OnInit {
       this.subcategoryForm.reset();
 
       setTimeout(() => {
-        this.router.navigate(['/landing']);
+        this.router.navigate(['/']);
       }, 1500);
     } catch (err: any) {
       this.errorMessage.set(err.message || 'An error occurred while creating subcategory.');

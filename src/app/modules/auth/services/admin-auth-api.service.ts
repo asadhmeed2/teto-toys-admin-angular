@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { parseHttpError } from '../../../shared/utils/error';
 
 export interface LoginResponse {
   access_token: string;
@@ -20,10 +21,7 @@ export class AdminAuthApiService {
         this.http.post<LoginResponse>(`${this.baseUrl}/login`, { email, password }, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Login failed');
-      }
-      throw err;
+      throw parseHttpError(err, 'Login failed');
     }
   }
 
@@ -43,10 +41,7 @@ export class AdminAuthApiService {
         })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Validation failed');
-      }
-      throw err;
+      throw parseHttpError(err, 'Validation failed');
     }
   }
 
@@ -56,10 +51,7 @@ export class AdminAuthApiService {
         this.http.post<LoginResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Refresh failed');
-      }
-      throw err;
+      throw parseHttpError(err, 'Refresh failed');
     }
   }
 }

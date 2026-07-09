@@ -44,7 +44,7 @@ export class CreateCategoryComponent {
       
       // ponytail: Redirect to dashboard after a short delay so they see success state
       setTimeout(() => {
-        this.router.navigate(['/landing']);
+        this.router.navigate(['/']);
       }, 1500);
     } catch (err: any) {
       this.errorMessage.set(err.message || 'An error occurred while creating category.');

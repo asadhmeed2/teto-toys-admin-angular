@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { parseHttpError } from '../../../shared/utils/error';
 import { Category } from '../../create-category/services/create-category-api.service';
 import { Subcategory } from '../../create-subcategory/services/create-subcategory-api.service';
 
@@ -63,10 +64,7 @@ export class CreateProductApiService {
         this.http.get<PaginatedPartsResponse>(`${this.baseUrl}/parts`, { params, withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to fetch parts');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to fetch parts');
     }
   }
 
@@ -76,10 +74,7 @@ export class CreateProductApiService {
       const url = `${this.baseUrl}/categories?page=${page}&pageSize=${pageSize}`;
       return await firstValueFrom(this.http.get<{ items: Category[] }>(url, { withCredentials: true }));
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to fetch categories');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to fetch categories');
     }
   }
 
@@ -89,10 +84,7 @@ export class CreateProductApiService {
       const url = `${this.baseUrl}/subcategories?page=${page}&pageSize=${pageSize}`;
       return await firstValueFrom(this.http.get<{ items: Subcategory[] }>(url, { withCredentials: true }));
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to fetch subcategories');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to fetch subcategories');
     }
   }
 
@@ -103,10 +95,7 @@ export class CreateProductApiService {
         this.http.post<CreateProductResponse>(`${this.baseUrl}/products`, request, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to create product');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to create product');
     }
   }
 }

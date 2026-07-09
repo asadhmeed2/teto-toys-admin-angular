@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { parseHttpError } from '../../../shared/utils/error';
 
 export interface CreatePartRequest {
   title: string;
@@ -28,10 +29,7 @@ export class CreatePartApiService {
         this.http.post<CreatePartResponse>(this.baseUrl, request, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to create part');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to create part');
     }
   }
 }

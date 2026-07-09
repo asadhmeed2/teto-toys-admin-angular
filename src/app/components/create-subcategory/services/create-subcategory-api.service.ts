@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { parseHttpError } from '../../../shared/utils/error';
 import { Category } from '../../create-category/services/create-category-api.service';
 
 export interface Subcategory {
@@ -22,10 +23,7 @@ export class CreateSubcategoryApiService {
       const url = `${this.baseUrl}/categories?page=${page}&pageSize=${pageSize}`;
       return await firstValueFrom(this.http.get<{ items: Category[] }>(url, { withCredentials: true }));
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to load categories');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to load categories');
     }
   }
 
@@ -37,10 +35,7 @@ export class CreateSubcategoryApiService {
         this.http.post<Subcategory>(url, { categoryId, name }, { withCredentials: true })
       );
     } catch (err) {
-      if (err instanceof HttpErrorResponse) {
-        throw new Error(err.error?.error_description || err.error?.error || err.message || 'Failed to create subcategory');
-      }
-      throw err;
+      throw parseHttpError(err, 'Failed to create subcategory');
     }
   }
 }
