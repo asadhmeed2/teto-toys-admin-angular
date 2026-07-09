@@ -102,7 +102,7 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Products</span>
-          <span class="stat-value">—</span>
+          <span class="stat-value">{{ productsCount() }}</span>
         </div>
       </div>
 
@@ -117,8 +117,218 @@
       </div>
     </div>
 
-    <div class="coming-soon">
-      <p>More features coming soon.</p>
+    <!-- Products list section -->
+    <div class="products-section">
+      <div class="section-header">
+        <h2>Products</h2>
+        <div class="search-bar">
+          <input type="text" placeholder="Search products..." (input)="onProductsSearch($event)" />
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Subtitle</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Images</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (prod of products(); track prod.product_id) {
+              <tr>
+                <td class="font-semibold">{{ prod.title }}</td>
+                <td class="text-secondary">{{ prod.subtitle || '—' }}</td>
+                <td>{{ categoryMap()[prod.category] || 'Category ID: ' + prod.category }}</td>
+                <td class="price-cell">{{ prod.price | currency }}</td>
+                <td>
+                  <div class="thumbnail-list">
+                    @for (url of prod.image_urls; track $index) {
+                      <img [src]="url" alt="Thumbnail" class="product-thumb" (click)="openImagePreview(url)" />
+                    } @empty {
+                      <span class="no-images">No Images</span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <button class="action-btn edit" (click)="openEditModal(prod.product_id)">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="text-center no-products">
+                  @if (isProductsLoading()) {
+                    Loading products list...
+                  } @else {
+                    No products found.
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (productsTotalPages() > 1) {
+        <div class="pagination">
+          <button [disabled]="productsPage() === 1" (click)="changeProductsPage(-1)" class="pagination-btn">
+            Previous
+          </button>
+          <span class="pagination-info">Page {{ productsPage() }} of {{ productsTotalPages() }}</span>
+          <button [disabled]="productsPage() === productsTotalPages()" (click)="changeProductsPage(1)" class="pagination-btn">
+            Next
+          </button>
+        </div>
+      }
     </div>
   </main>
 </div>
+
+<!-- Image Preview Modal -->
+@if (isImageModalOpen()) {
+  <div class="modal-overlay image-preview-modal" (click)="closeImagePreview()">
+    <div class="modal-card image-card" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeImagePreview()" aria-label="Close preview">&times;</button>
+      <img [src]="previewImageUrl()" alt="Full Preview" class="full-preview-img" />
+    </div>
+  </div>
+}
+
+<!-- Product Edit Form Modal -->
+@if (isEditModalOpen()) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-card edit-product-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>Edit Product</h3>
+        <button class="modal-close-btn" (click)="closeEditModal()" aria-label="Close edit modal">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        @if (editSuccessMessage()) {
+          <div class="alert alert-success">{{ editSuccessMessage() }}</div>
+        }
+        @if (editErrorMessage()) {
+          <div class="alert alert-error">{{ editErrorMessage() }}</div>
+        }
+
+        <form [formGroup]="editForm" (submit)="$event.preventDefault(); onSaveProduct()" class="modal-form">
+          <div class="form-group">
+            <label for="edit-title">Product Title</label>
+            <input id="edit-title" type="text" formControlName="title" placeholder="e.g. Train Set" />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-subtitle">Subtitle</label>
+            <input id="edit-subtitle" type="text" formControlName="subtitle" placeholder="e.g. Eco-friendly" />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-description">Description</label>
+            <textarea id="edit-description" formControlName="description" rows="3" placeholder="Description..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-category">Category</label>
+              <select id="edit-category" formControlName="category">
+                <option [value]="null" disabled>-- Select Category --</option>
+                @for (cat of categories(); track cat.id) {
+                  <option [value]="cat.id">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-subcategory">Subcategory</label>
+              <select id="edit-subcategory" formControlName="subcategory" [disabled]="!selectedCategory()">
+                <option [value]="null">-- Select Subcategory (Optional) --</option>
+                @for (sub of filteredSubcategories(); track sub.id) {
+                  <option [value]="sub.id">{{ sub.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-price">Price ($)</label>
+            <input id="edit-price" type="number" step="0.01" formControlName="price" placeholder="29.99" />
+          </div>
+
+          <!-- Dynamic Image URLs List -->
+          <div class="form-group">
+            <label>Image URLs</label>
+            <div class="image-inputs-list">
+              @for (ctrl of imageUrlsArray.controls; track $index) {
+                <div class="image-input-row">
+                  <input type="url" [formControl]="ctrl" placeholder="https://example.com/image.jpg" />
+                  <button type="button" class="remove-image-btn" (click)="removeImageUrl($index)">&times;</button>
+                </div>
+              }
+            </div>
+            <button type="button" class="add-image-btn" (click)="addImageUrl()">+ Add Image URL</button>
+          </div>
+
+          <!-- Parts Selector list -->
+          <div class="form-group">
+            <label>Connect Parts</label>
+            <div class="parts-selector-container">
+              <div class="parts-search-bar">
+                <input type="text" placeholder="Search parts by title..." (input)="onPartsSearch($event)" />
+              </div>
+
+              <div class="parts-list">
+                @for (part of parts(); track part.part_id) {
+                  <div class="part-item" 
+                       [class.selected]="editForm.controls.partIds.value.includes(part.part_id)"
+                       (click)="togglePartSelection(part.part_id)">
+                    <div class="part-checkbox">
+                      @if (editForm.controls.partIds.value.includes(part.part_id)) {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                          <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" />
+                        </svg>
+                      }
+                    </div>
+                    <div class="part-details">
+                      <span class="part-title">{{ part.title }}</span>
+                      @if (part.description) {
+                        <span class="part-desc">{{ part.description }}</span>
+                      }
+                    </div>
+                    <span class="part-price">${{ part.price.toFixed(2) }}</span>
+                  </div>
+                } @empty {
+                  <div class="no-parts">No parts found</div>
+                }
+
+                @if (hasMoreParts()) {
+                  <button type="button" class="load-more-parts-btn" (click)="loadMoreParts($event)" [disabled]="isPartsLoading()">
+                    {{ isPartsLoading() ? 'Loading...' : 'Load More Parts' }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <footer class="modal-footer">
+            <button type="button" class="cancel-btn" (click)="closeEditModal()" [disabled]="isSaving()">
+              Cancel
+            </button>
+            <button type="submit" class="save-btn" [disabled]="isSaving() || editForm.invalid">
+              @if (isSaving()) {
+                Saving...
+              } @else {
+                Save Changes
+              }
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  </div>
+}

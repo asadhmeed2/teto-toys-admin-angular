@@ -98,4 +98,40 @@ export class CreateProductApiService {
       throw parseHttpError(err, 'Failed to create product');
     }
   }
+
+  async getProducts(page = 1, pageSize = 10, search = ''): Promise<{ items: CreateProductResponse[], total_count: number, total_pages: number }> {
+    try {
+      let params = new HttpParams()
+        .set('page', page.toString())
+        .set('pageSize', pageSize.toString());
+      if (search) {
+        params = params.set('search', search);
+      }
+      return await firstValueFrom(
+        this.http.get<{ items: CreateProductResponse[], total_count: number, total_pages: number }>(`${this.baseUrl}/products`, { params, withCredentials: true })
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to fetch products');
+    }
+  }
+
+  async getProduct(productId: string): Promise<CreateProductResponse & { part_ids: string[] }> {
+    try {
+      return await firstValueFrom(
+        this.http.get<CreateProductResponse & { part_ids: string[] }>(`${this.baseUrl}/products/${productId}`, { withCredentials: true })
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to fetch product details');
+    }
+  }
+
+  async updateProduct(productId: string, request: CreateProductRequest): Promise<CreateProductResponse> {
+    try {
+      return await firstValueFrom(
+        this.http.put<CreateProductResponse>(`${this.baseUrl}/products/${productId}`, request, { withCredentials: true })
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to update product');
+    }
+  }
 }
