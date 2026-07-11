@@ -1,15 +1,16 @@
 # AGENTS.md
 
-## Dev environment tips
+## Dev environment mandatory tips
 - **Component Location**: Always create new components inside the `components/` directory.
 - **Component Architecture**:
   - Keep components modular, reusable, and designed as **standalone** components.
   - Create a dedicated service inside a nested `services/` folder within the component's folder to manage business logic, keeping the component clean and focused solely on the UI.
   - create a dedicated `index.ts` file that exports the component ts file with `export * from './component-name.component';` and same for its related types and services like `export * from './types/component-name.types';` and `export * from './services/component-name.service';`.
-  - allways use async await for api calls. and get the response from the api service using `await firstValueFrom(this.http.get(...));`.
+  - always use async await for api calls. and get the response from the api service using `await firstValueFrom(this.http.get(...));`.
   - do not use .then() or .subscribe() for api calls.
   - do not use fetch api for api calls.
-  - allways use promise.all when fetching multiple api calls in a component.
+  - always use promise.all when fetching multiple api calls in a component.
+  - always use angular routerLink instead of anchor tags.
 - **Signal-Based Architecture**: Build components using signal-based APIs (e.g., `input`, `output`, `computed`, `effect`,and `viewChild`).
 - **Type Safety**: Define and enforce TypeScript types/interfaces for all components and services.
 - **Modern Angular Control Flow**: Always use `@for`, `@if`, and `@switch` instead of legacy directives like `ngFor`, `ngIf`, and `ngSwitch`.
