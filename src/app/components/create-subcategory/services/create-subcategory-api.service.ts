@@ -27,6 +27,16 @@ export class CreateSubcategoryApiService {
     }
   }
 
+  // ponytail: fetch subcategories using HttpClient and async/await
+  async getSubcategories(page = 1, pageSize = 100): Promise<{ items: Subcategory[] }> {
+    try {
+      const url = `${this.baseUrl}/subcategories?page=${page}&pageSize=${pageSize}`;
+      return await firstValueFrom(this.http.get<{ items: Subcategory[] }>(url, { withCredentials: true }));
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to fetch subcategories');
+    }
+  }
+
   // ponytail: create subcategory using HttpClient and async/await
   async createSubcategory(categoryId: number, name: string): Promise<Subcategory> {
     try {

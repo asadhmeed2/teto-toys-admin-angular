@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
 import { Category } from '../../create-category/services/create-category-api.service';
-import { Subcategory } from '../../create-subcategory/services/create-subcategory-api.service';
+import { Subcategory, CreateSubcategoryApiService } from '../../create-subcategory/services/create-subcategory-api.service';
 
 export interface PartDto {
   part_id: string;
@@ -47,6 +47,7 @@ export interface CreateProductResponse {
 @Injectable()
 export class CreateProductApiService {
   private readonly http = inject(HttpClient);
+  private readonly subcategoryApi = inject(CreateSubcategoryApiService);
   private readonly baseUrl = 'http://localhost:8081/api/admin';
 
   async getParts(page: number, pageSize: number, search?: string): Promise<PaginatedPartsResponse> {
@@ -68,24 +69,13 @@ export class CreateProductApiService {
     }
   }
 
-  // ponytail: fetch all categories
-  async getCategories(page = 1, pageSize = 100): Promise<{ items: Category[] }> {
-    try {
-      const url = `${this.baseUrl}/categories?page=${page}&pageSize=${pageSize}`;
-      return await firstValueFrom(this.http.get<{ items: Category[] }>(url, { withCredentials: true }));
-    } catch (err) {
-      throw parseHttpError(err, 'Failed to fetch categories');
-    }
+  // ponytail: category/subcategory fetches live on CreateSubcategoryApiService, delegate instead of duplicating
+  getCategories(page = 1, pageSize = 100): Promise<{ items: Category[] }> {
+    return this.subcategoryApi.getCategories(page, pageSize);
   }
 
-  // ponytail: fetch all subcategories
-  async getSubcategories(page = 1, pageSize = 100): Promise<{ items: Subcategory[] }> {
-    try {
-      const url = `${this.baseUrl}/subcategories?page=${page}&pageSize=${pageSize}`;
-      return await firstValueFrom(this.http.get<{ items: Subcategory[] }>(url, { withCredentials: true }));
-    } catch (err) {
-      throw parseHttpError(err, 'Failed to fetch subcategories');
-    }
+  getSubcategories(page = 1, pageSize = 100): Promise<{ items: Subcategory[] }> {
+    return this.subcategoryApi.getSubcategories(page, pageSize);
   }
 
   async createProduct(request: CreateProductRequest): Promise<CreateProductResponse> {
