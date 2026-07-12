@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
+import { API_BASE_URL } from '../../../shared/config/api.config';
 import { Category } from '../../create-category/services/create-category-api.service';
 import { Subcategory, CreateSubcategoryApiService } from '../../create-subcategory/services/create-subcategory-api.service';
 
@@ -48,7 +49,7 @@ export interface CreateProductResponse {
 export class CreateProductApiService {
   private readonly http = inject(HttpClient);
   private readonly subcategoryApi = inject(CreateSubcategoryApiService);
-  private readonly baseUrl = 'http://localhost:8081/api/admin';
+  private readonly baseUrl = `${API_BASE_URL}/api/admin`;
 
   async getParts(page: number, pageSize: number, search?: string): Promise<PaginatedPartsResponse> {
     try {

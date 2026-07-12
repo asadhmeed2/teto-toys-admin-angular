@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
+import { API_BASE_URL } from '../../../shared/config/api.config';
 
 export interface CreateUserRequest {
   email: string;
@@ -22,7 +23,7 @@ export interface CreateUserResponse {
 @Injectable()
 export class CreateUserApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8081/api/admin/users';
+  private readonly baseUrl = `${API_BASE_URL}/api/admin/users`;
 
   async createUser(request: CreateUserRequest): Promise<CreateUserResponse> {
     try {

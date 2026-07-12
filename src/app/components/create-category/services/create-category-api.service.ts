@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
+import { API_BASE_URL } from '../../../shared/config/api.config';
 
 export interface Category {
   id: number;
@@ -13,7 +14,7 @@ export interface Category {
   providedIn: 'root',
 })
 export class CreateCategoryApiService {
-  private readonly baseUrl = 'http://localhost:8081/api/admin/categories';
+  private readonly baseUrl = `${API_BASE_URL}/api/admin/categories`;
   private readonly http = inject(HttpClient);
 
   // ponytail: standard create using Angular HttpClient and async/await

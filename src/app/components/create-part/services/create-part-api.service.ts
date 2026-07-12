@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
+import { API_BASE_URL } from '../../../shared/config/api.config';
 
 export interface CreatePartRequest {
   title: string;
@@ -20,7 +21,7 @@ export interface CreatePartResponse {
 @Injectable()
 export class CreatePartApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8081/api/admin/parts';
+  private readonly baseUrl = `${API_BASE_URL}/api/admin/parts`;
 
   async createPart(request: CreatePartRequest): Promise<CreatePartResponse> {
     try {

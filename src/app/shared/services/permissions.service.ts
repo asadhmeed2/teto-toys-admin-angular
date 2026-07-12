@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface UserPermissions {
   userCreation: boolean;
@@ -9,7 +10,7 @@ export interface UserPermissions {
 @Injectable({ providedIn: 'root' })
 export class PermissionsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8081/api/auth';
+  private readonly baseUrl = `${API_BASE_URL}/api/auth`;
 
   // ponytail: simple signal to hold permissions state
   private readonly _permissions = signal<UserPermissions | null>(null);

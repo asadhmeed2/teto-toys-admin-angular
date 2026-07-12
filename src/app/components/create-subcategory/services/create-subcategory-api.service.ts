@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
+import { API_BASE_URL } from '../../../shared/config/api.config';
 import { Category } from '../../create-category/services/create-category-api.service';
 
 export interface Subcategory {
@@ -14,7 +15,7 @@ export interface Subcategory {
   providedIn: 'root',
 })
 export class CreateSubcategoryApiService {
-  private readonly baseUrl = 'http://localhost:8081/api/admin';
+  private readonly baseUrl = `${API_BASE_URL}/api/admin`;
   private readonly http = inject(HttpClient);
 
   // ponytail: fetch categories using HttpClient and async/await to populate parent dropdown

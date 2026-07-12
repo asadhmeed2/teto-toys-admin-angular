@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { parseHttpError } from '../../../shared/utils/error';
+import { API_BASE_URL } from '../../../shared/config/api.config';
 
 export interface LoginResponse {
   access_token: string;
@@ -13,7 +14,7 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AdminAuthApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8081/api/auth';
+  private readonly baseUrl = `${API_BASE_URL}/api/auth`;
 
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
