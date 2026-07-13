@@ -43,6 +43,7 @@ export interface CreateProductResponse {
   price: number;
   part_ids: string[];
   image_urls: string[];
+  is_deleted?: boolean;
 }
 
 @Injectable()
