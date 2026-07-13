@@ -32,6 +32,7 @@ export class LandingPageComponent implements OnInit {
   protected readonly productsSearch = signal('');
   protected readonly isProductsLoading = signal(false);
   protected readonly deletingProductId = signal<string | null>(null);
+  protected readonly togglingDisplayProductId = signal<string | null>(null);
 
   // Category & Subcategory lookup lists
   protected readonly categories = signal<Category[]>([]);
@@ -191,6 +192,22 @@ export class LandingPageComponent implements OnInit {
     } finally {
       this.deletingProductId.set(null);
       this.pendingDeleteProduct.set(null);
+    }
+  }
+
+  protected async toggleProductDisplay(productId: string, currentIsDisplayed: boolean): Promise<void> {
+    if (this.togglingDisplayProductId()) return;
+    this.togglingDisplayProductId.set(productId);
+    try {
+      await this.productApiService.setProductDisplay(productId, !currentIsDisplayed);
+      // Update local list optimistically
+      this.products.update(list =>
+        list.map(p => p.product_id === productId ? { ...p, is_displayed: !currentIsDisplayed } : p)
+      );
+    } catch (err: any) {
+      alert(err.message || 'Failed to update product visibility.');
+    } finally {
+      this.togglingDisplayProductId.set(null);
     }
   }
 

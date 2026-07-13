@@ -43,6 +43,7 @@ export interface CreateProductResponse {
   price: number;
   part_ids: string[];
   image_urls: string[];
+  is_displayed?: boolean;
   is_deleted?: boolean;
 }
 
@@ -124,6 +125,16 @@ export class CreateProductApiService {
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to update product');
+    }
+  }
+
+  async setProductDisplay(productId: string, isDisplayed: boolean): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.patch<void>(`${this.baseUrl}/products/${productId}/display`, { is_displayed: isDisplayed }, { withCredentials: true })
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to update product visibility');
     }
   }
 

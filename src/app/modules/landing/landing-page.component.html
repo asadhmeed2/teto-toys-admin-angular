@@ -303,6 +303,15 @@
                   </button>
                   @if (!prod.is_deleted) {
                     <button
+                      class="action-btn"
+                      [class.hide]="prod.is_displayed !== false"
+                      [class.show]="prod.is_displayed === false"
+                      [disabled]="togglingDisplayProductId() === prod.product_id"
+                      (click)="toggleProductDisplay(prod.product_id, prod.is_displayed !== false)"
+                    >
+                      {{ togglingDisplayProductId() === prod.product_id ? '...' : (prod.is_displayed === false ? 'Show' : 'Hide') }}
+                    </button>
+                    <button
                       class="action-btn delete"
                       [disabled]="deletingProductId() === prod.product_id"
                       (click)="deleteProduct(prod.product_id, prod.title)"

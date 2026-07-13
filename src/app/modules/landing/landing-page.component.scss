@@ -459,6 +459,20 @@
     box-shadow: 0 0 10px rgba(8, 184, 128, 0.15);
   }
 
+  &.hide:hover:not(:disabled) {
+    color: var(--text-primary);
+    background: rgba(234, 179, 8, 0.08);
+    border-color: #eab308;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.15);
+  }
+
+  &.show:hover:not(:disabled) {
+    color: var(--text-primary);
+    background: rgba(8, 184, 128, 0.08);
+    border-color: var(--brand-green);
+    box-shadow: 0 0 10px rgba(8, 184, 128, 0.15);
+  }
+
   &.delete:hover:not(:disabled) {
     color: var(--text-primary);
     background: rgba(255, 51, 77, 0.08);
