@@ -9,11 +9,12 @@ import { AdminAuthApiService } from '../auth/services/admin-auth-api.service';
 import { CreateProductApiService, CreateProductResponse, PartDto } from '../../components/create-product';
 import { Category } from '../../components/create-category/services/create-category-api.service';
 import { Subcategory } from '../../components/create-subcategory/services/create-subcategory-api.service';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, ConfirmationModalComponent],
   providers: [CreateProductApiService],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss',
@@ -30,6 +31,7 @@ export class LandingPageComponent implements OnInit {
   protected readonly productsTotalPages = signal(1);
   protected readonly productsSearch = signal('');
   protected readonly isProductsLoading = signal(false);
+  protected readonly deletingProductId = signal<string | null>(null);
 
   // Category & Subcategory lookup lists
   protected readonly categories = signal<Category[]>([]);
@@ -52,6 +54,10 @@ export class LandingPageComponent implements OnInit {
 
   protected readonly isImageModalOpen = signal(false);
   protected readonly previewImageUrl = signal<string>('');
+
+  // Delete confirmation modal signals
+  protected readonly isDeleteModalOpen = signal(false);
+  protected readonly pendingDeleteProduct = signal<{ id: string; title: string } | null>(null);
 
   // Form group definition
   protected readonly editForm = new FormGroup({
@@ -158,6 +164,33 @@ export class LandingPageComponent implements OnInit {
     if (next >= 1 && next <= this.productsTotalPages()) {
       this.productsPage.set(next);
       this.loadProducts();
+    }
+  }
+
+  protected deleteProduct(productId: string, title: string): void {
+    this.pendingDeleteProduct.set({ id: productId, title });
+    this.isDeleteModalOpen.set(true);
+  }
+
+  protected cancelDeleteProduct(): void {
+    this.isDeleteModalOpen.set(false);
+    this.pendingDeleteProduct.set(null);
+  }
+
+  protected async confirmDeleteProduct(): Promise<void> {
+    const pending = this.pendingDeleteProduct();
+    if (!pending) return;
+
+    this.isDeleteModalOpen.set(false);
+    this.deletingProductId.set(pending.id);
+    try {
+      await this.productApiService.deleteProduct(pending.id);
+      await this.loadProducts();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete product.');
+    } finally {
+      this.deletingProductId.set(null);
+      this.pendingDeleteProduct.set(null);
     }
   }
 

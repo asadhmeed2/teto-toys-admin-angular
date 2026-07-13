@@ -1,0 +1,21 @@
+@if (open()) {
+  <div class="modal-overlay" (click)="onCancel()">
+    <div class="modal-card confirmation-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>{{ title() }}</h3>
+        <button class="modal-close-btn" (click)="onCancel()" aria-label="Close">&times;</button>
+      </header>
+
+      @if (message()) {
+        <div class="modal-body">
+          <p>{{ message() }}</p>
+        </div>
+      }
+
+      <footer class="modal-footer">
+        <button class="cancel-btn" (click)="onCancel()">{{ cancelText() }}</button>
+        <button class="save-btn" [class.danger-btn]="danger()" (click)="onConfirm()">{{ confirmText() }}</button>
+      </footer>
+    </div>
+  </div>
+}

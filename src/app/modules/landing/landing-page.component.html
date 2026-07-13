@@ -154,9 +154,16 @@
                     }
                   </div>
                 </td>
-                <td>
+                <td class="actions-cell">
                   <button class="action-btn edit" (click)="openEditModal(prod.product_id)">
                     Edit
+                  </button>
+                  <button
+                    class="action-btn delete"
+                    [disabled]="deletingProductId() === prod.product_id"
+                    (click)="deleteProduct(prod.product_id, prod.title)"
+                  >
+                    {{ deletingProductId() === prod.product_id ? 'Deleting...' : 'Delete' }}
                   </button>
                 </td>
               </tr>
@@ -332,3 +339,15 @@
     </div>
   </div>
 }
+
+<!-- Delete Product Confirmation Modal -->
+<app-confirmation-modal
+  [open]="isDeleteModalOpen()"
+  title="Delete Product"
+  [message]="'Delete \'' + (pendingDeleteProduct()?.title ?? '') + '\'? This action cannot be undone.'"
+  confirmText="Delete"
+  cancelText="Cancel"
+  [danger]="true"
+  (confirmed)="confirmDeleteProduct()"
+  (cancelled)="cancelDeleteProduct()"
+/>

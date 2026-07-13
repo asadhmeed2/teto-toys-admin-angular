@@ -125,4 +125,15 @@ export class CreateProductApiService {
       throw parseHttpError(err, 'Failed to update product');
     }
   }
+
+  // ponytail: soft delete — backend flips is_deleted, row stays in the DB
+  async deleteProduct(productId: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.delete<void>(`${this.baseUrl}/products/${productId}`, { withCredentials: true })
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to delete product');
+    }
+  }
 }
