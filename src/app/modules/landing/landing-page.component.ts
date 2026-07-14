@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+﻿import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
@@ -6,9 +6,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../shared/services/auth.service';
 import { PermissionsService } from '../../shared/services/permissions.service';
 import { AdminAuthApiService } from '../auth/services/admin-auth-api.service';
-import { CreateProductApiService, CreateProductResponse, PartDto } from '../../components/create-product';
-import { Category } from '../../components/create-category/services/create-category-api.service';
-import { Subcategory } from '../../components/create-subcategory/services/create-subcategory-api.service';
+import { CreateProductApiService, CreateProductResponse, PartDto } from '../products/forms/create-product';
+import { Category } from '../products/forms/create-category/services/create-category-api.service';
+import { Subcategory } from '../products/forms/create-subcategory/services/create-subcategory-api.service';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal';
 
 @Component({
