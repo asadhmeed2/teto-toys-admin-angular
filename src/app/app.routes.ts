@@ -23,25 +23,29 @@ export const routes: Routes = [
   {
     path: 'create-product',
     loadComponent: () =>
-      import('./modules/products/forms/create-product').then((m) => m.CreateProductComponent),
+      import('./modules/products/forms/components/create-product').then(
+        (m) => m.CreateProductComponent,
+      ),
     canActivate: [authGuard],
   },
   {
     path: 'create-part',
     loadComponent: () =>
-      import('./modules/products/forms/create-part').then((m) => m.CreatePartComponent),
+      import('./modules/products/forms/components/create-part').then((m) => m.CreatePartComponent),
     canActivate: [authGuard],
   },
   {
     path: 'create-category',
     loadComponent: () =>
-      import('./modules/products/forms/create-category').then((m) => m.CreateCategoryComponent),
+      import('./modules/products/forms/components/create-category').then(
+        (m) => m.CreateCategoryComponent,
+      ),
     canActivate: [authGuard],
   },
   {
     path: 'create-subcategory',
     loadComponent: () =>
-      import('./modules/products/forms/create-subcategory').then(
+      import('./modules/products/forms/components/create-subcategory').then(
         (m) => m.CreateSubcategoryComponent,
       ),
     canActivate: [authGuard],

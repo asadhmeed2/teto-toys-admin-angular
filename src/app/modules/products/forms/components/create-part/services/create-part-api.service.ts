@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { parseHttpError } from '../../../../../shared/utils/error';
-import { API_BASE_URL } from '../../../../../shared/config/api.config';
+import { parseHttpError } from '../../../../../../shared/utils/error';
+import { API_BASE_URL } from '../../../../../../shared/config/api.config';
 
 export interface CreatePartRequest {
   title: string;
@@ -27,7 +27,7 @@ export class CreatePartApiService {
     try {
       // ponytail: standard POST withCredentials for API call
       return await firstValueFrom(
-        this.http.post<CreatePartResponse>(this.baseUrl, request, { withCredentials: true })
+        this.http.post<CreatePartResponse>(this.baseUrl, request, { withCredentials: true }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to create part');

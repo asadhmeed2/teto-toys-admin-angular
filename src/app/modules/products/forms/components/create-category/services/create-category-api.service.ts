@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { parseHttpError } from '../../../../../shared/utils/error';
-import { API_BASE_URL } from '../../../../../shared/config/api.config';
+import { parseHttpError } from '../../../../../../shared/utils/error';
+import { API_BASE_URL } from '../../../../../../shared/config/api.config';
 
 export interface Category {
   id: number;
@@ -21,7 +21,7 @@ export class CreateCategoryApiService {
   async createCategory(name: string): Promise<Category> {
     try {
       return await firstValueFrom(
-        this.http.post<Category>(this.baseUrl, { name }, { withCredentials: true })
+        this.http.post<Category>(this.baseUrl, { name }, { withCredentials: true }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to create category');

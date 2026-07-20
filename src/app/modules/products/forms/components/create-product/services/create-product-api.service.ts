@@ -1,10 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { parseHttpError } from '../../../../../shared/utils/error';
-import { API_BASE_URL } from '../../../../../shared/config/api.config';
+import { parseHttpError } from '../../../../../../shared/utils/error';
+import { API_BASE_URL } from '../../../../../../shared/config/api.config';
 import { Category } from '../../create-category/services/create-category-api.service';
-import { Subcategory, CreateSubcategoryApiService } from '../../create-subcategory/services/create-subcategory-api.service';
+import {
+  Subcategory,
+  CreateSubcategoryApiService,
+} from '../../create-subcategory/services/create-subcategory-api.service';
 
 export interface PartDto {
   part_id: string;
@@ -66,7 +69,10 @@ export class CreateProductApiService {
 
       // ponytail: fetch paginated parts with credential options
       return await firstValueFrom(
-        this.http.get<PaginatedPartsResponse>(`${this.baseUrl}/parts`, { params, withCredentials: true })
+        this.http.get<PaginatedPartsResponse>(`${this.baseUrl}/parts`, {
+          params,
+          withCredentials: true,
+        }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to fetch parts');
@@ -86,14 +92,20 @@ export class CreateProductApiService {
     try {
       // ponytail: standard POST withCredentials to register products
       return await firstValueFrom(
-        this.http.post<CreateProductResponse>(`${this.baseUrl}/products`, request, { withCredentials: true })
+        this.http.post<CreateProductResponse>(`${this.baseUrl}/products`, request, {
+          withCredentials: true,
+        }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to create product');
     }
   }
 
-  async getProducts(page = 1, pageSize = 10, search = ''): Promise<{ items: CreateProductResponse[], total_count: number, total_pages: number }> {
+  async getProducts(
+    page = 1,
+    pageSize = 10,
+    search = '',
+  ): Promise<{ items: CreateProductResponse[]; total_count: number; total_pages: number }> {
     try {
       let params = new HttpParams()
         .set('page', page.toString())
@@ -102,7 +114,10 @@ export class CreateProductApiService {
         params = params.set('search', search);
       }
       return await firstValueFrom(
-        this.http.get<{ items: CreateProductResponse[], total_count: number, total_pages: number }>(`${this.baseUrl}/products`, { params, withCredentials: true })
+        this.http.get<{ items: CreateProductResponse[]; total_count: number; total_pages: number }>(
+          `${this.baseUrl}/products`,
+          { params, withCredentials: true },
+        ),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to fetch products');
@@ -112,17 +127,25 @@ export class CreateProductApiService {
   async getProduct(productId: string): Promise<CreateProductResponse & { part_ids: string[] }> {
     try {
       return await firstValueFrom(
-        this.http.get<CreateProductResponse & { part_ids: string[] }>(`${this.baseUrl}/products/${productId}`, { withCredentials: true })
+        this.http.get<CreateProductResponse & { part_ids: string[] }>(
+          `${this.baseUrl}/products/${productId}`,
+          { withCredentials: true },
+        ),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to fetch product details');
     }
   }
 
-  async updateProduct(productId: string, request: CreateProductRequest): Promise<CreateProductResponse> {
+  async updateProduct(
+    productId: string,
+    request: CreateProductRequest,
+  ): Promise<CreateProductResponse> {
     try {
       return await firstValueFrom(
-        this.http.put<CreateProductResponse>(`${this.baseUrl}/products/${productId}`, request, { withCredentials: true })
+        this.http.put<CreateProductResponse>(`${this.baseUrl}/products/${productId}`, request, {
+          withCredentials: true,
+        }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to update product');
@@ -132,7 +155,11 @@ export class CreateProductApiService {
   async setProductDisplay(productId: string, isDisplayed: boolean): Promise<void> {
     try {
       await firstValueFrom(
-        this.http.patch<void>(`${this.baseUrl}/products/${productId}/display`, { is_displayed: isDisplayed }, { withCredentials: true })
+        this.http.patch<void>(
+          `${this.baseUrl}/products/${productId}/display`,
+          { is_displayed: isDisplayed },
+          { withCredentials: true },
+        ),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to update product visibility');
@@ -143,7 +170,7 @@ export class CreateProductApiService {
   async deleteProduct(productId: string): Promise<void> {
     try {
       await firstValueFrom(
-        this.http.delete<void>(`${this.baseUrl}/products/${productId}`, { withCredentials: true })
+        this.http.delete<void>(`${this.baseUrl}/products/${productId}`, { withCredentials: true }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to delete product');
