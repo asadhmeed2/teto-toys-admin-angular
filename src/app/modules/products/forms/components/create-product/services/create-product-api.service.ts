@@ -31,6 +31,7 @@ export interface CreateProductRequest {
   price: number;
   part_ids: string[];
   image_urls: string[];
+  language?: string;
 }
 
 export interface CreateProductResponse {

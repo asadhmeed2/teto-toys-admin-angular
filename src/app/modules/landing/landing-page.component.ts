@@ -6,9 +6,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../shared/services/auth.service';
 import { PermissionsService } from '../../shared/services/permissions.service';
 import { AdminAuthApiService } from '../auth/services/admin-auth-api.service';
-import { CreateProductApiService, CreateProductResponse, PartDto } from '../products/forms/create-product';
-import { Category } from '../products/forms/create-category/services/create-category-api.service';
-import { Subcategory } from '../products/forms/create-subcategory/services/create-subcategory-api.service';
+import {
+  CreateProductApiService,
+  CreateProductResponse,
+  PartDto,
+} from '../products/forms//components/create-product/services/create-product-api.service';
+import { Category } from '../products/forms/components/create-category/services/create-category-api.service';
+import { Subcategory } from '../products/forms/components/create-subcategory/services/create-subcategory-api.service';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal';
 
 @Component({
@@ -67,7 +71,10 @@ export class LandingPageComponent implements OnInit {
     description: new FormControl('', { nonNullable: true }),
     category: new FormControl<number | null>(null, { validators: [Validators.required] }),
     subcategory: new FormControl<number | null>(null),
-    price: new FormControl<number | null>(null, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
+    price: new FormControl<number | null>(null, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(0)],
+    }),
     imageUrls: new FormArray<FormControl<string>>([]),
     partIds: new FormControl<string[]>([], { nonNullable: true }),
   });
@@ -78,7 +85,7 @@ export class LandingPageComponent implements OnInit {
   protected readonly filteredSubcategories = computed(() => {
     const catId = this.selectedCategory();
     if (catId === null) return [];
-    return this.subcategories().filter(sub => sub.category_id === +catId);
+    return this.subcategories().filter((sub) => sub.category_id === +catId);
   });
 
   private readonly authService = inject(AuthService);
@@ -88,7 +95,7 @@ export class LandingPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   protected toggleMenu(): void {
-    this.isMenuOpen.update(open => !open);
+    this.isMenuOpen.update((open) => !open);
   }
 
   async ngOnInit(): Promise<void> {
@@ -101,15 +108,12 @@ export class LandingPageComponent implements OnInit {
     }
 
     // Load initial metadata and product lists
-    await Promise.all([
-      this.loadMetadata(),
-      this.loadProducts()
-    ]);
+    await Promise.all([this.loadMetadata(), this.loadProducts()]);
 
     // ponytail: reset subcategory when category changes and track selection
     this.editForm.controls.category.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(val => {
+      .subscribe((val) => {
         this.selectedCategory.set(val);
         this.editForm.controls.subcategory.setValue(null);
       });
@@ -120,7 +124,7 @@ export class LandingPageComponent implements OnInit {
     try {
       const [catsRes, subcatsRes] = await Promise.all([
         this.productApiService.getCategories(),
-        this.productApiService.getSubcategories()
+        this.productApiService.getSubcategories(),
       ]);
       const catsList = catsRes.items || [];
       this.categories.set(catsList);
@@ -142,7 +146,11 @@ export class LandingPageComponent implements OnInit {
     this.isProductsLoading.set(true);
 
     try {
-      const res = await this.productApiService.getProducts(this.productsPage(), 10, this.productsSearch());
+      const res = await this.productApiService.getProducts(
+        this.productsPage(),
+        10,
+        this.productsSearch(),
+      );
       this.products.set(res.items || []);
       this.productsCount.set(res.total_count || 0);
       this.productsTotalPages.set(res.total_pages || 1);
@@ -195,14 +203,19 @@ export class LandingPageComponent implements OnInit {
     }
   }
 
-  protected async toggleProductDisplay(productId: string, currentIsDisplayed: boolean): Promise<void> {
+  protected async toggleProductDisplay(
+    productId: string,
+    currentIsDisplayed: boolean,
+  ): Promise<void> {
     if (this.togglingDisplayProductId()) return;
     this.togglingDisplayProductId.set(productId);
     try {
       await this.productApiService.setProductDisplay(productId, !currentIsDisplayed);
       // Update local list optimistically
-      this.products.update(list =>
-        list.map(p => p.product_id === productId ? { ...p, is_displayed: !currentIsDisplayed } : p)
+      this.products.update((list) =>
+        list.map((p) =>
+          p.product_id === productId ? { ...p, is_displayed: !currentIsDisplayed } : p,
+        ),
       );
     } catch (err: any) {
       alert(err.message || 'Failed to update product visibility.');
@@ -249,7 +262,7 @@ export class LandingPageComponent implements OnInit {
       if (reset) {
         this.parts.set(res.items);
       } else {
-        this.parts.update(existing => [...existing, ...res.items]);
+        this.parts.update((existing) => [...existing, ...res.items]);
       }
       this.hasMoreParts.set(currentPage < res.total_pages);
       this.partsPage.set(currentPage + 1);
@@ -276,7 +289,7 @@ export class LandingPageComponent implements OnInit {
     const control = this.editForm.controls.partIds;
     const current = control.value;
     if (current.includes(partId)) {
-      control.setValue(current.filter(id => id !== partId));
+      control.setValue(current.filter((id) => id !== partId));
     } else {
       control.setValue([...current, partId]);
     }
@@ -351,7 +364,7 @@ export class LandingPageComponent implements OnInit {
     }
 
     try {
-      const filteredImages = val.imageUrls.filter(url => !!url.trim());
+      const filteredImages = val.imageUrls.filter((url) => !!url.trim());
 
       await this.productApiService.updateProduct(productId, {
         title: val.title.trim(),
@@ -361,11 +374,11 @@ export class LandingPageComponent implements OnInit {
         subcategory: val.subcategory || undefined,
         price: val.price ?? 0,
         part_ids: val.partIds,
-        image_urls: filteredImages
+        image_urls: filteredImages,
       });
 
       this.editSuccessMessage.set('Product updated successfully!');
-      
+
       // Reload products list
       await this.loadProducts();
 

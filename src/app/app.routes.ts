@@ -16,27 +16,34 @@ export const routes: Routes = [
   },
   {
     path: 'create-user',
-    loadComponent: () => import('./modules/users/components/create-user').then((m) => m.CreateUserComponent),
+    loadComponent: () =>
+      import('./modules/users/components/create-user').then((m) => m.CreateUserComponent),
     canActivate: [authGuard, adminGuard],
   },
   {
     path: 'create-product',
-    loadComponent: () => import('./modules/products/forms/create-product').then((m) => m.CreateProductComponent),
+    loadComponent: () =>
+      import('./modules/products/forms/create-product').then((m) => m.CreateProductComponent),
     canActivate: [authGuard],
   },
   {
     path: 'create-part',
-    loadComponent: () => import('./modules/products/forms/create-part').then((m) => m.CreatePartComponent),
+    loadComponent: () =>
+      import('./modules/products/forms/create-part').then((m) => m.CreatePartComponent),
     canActivate: [authGuard],
   },
   {
     path: 'create-category',
-    loadComponent: () => import('./modules/products/forms/create-category').then((m) => m.CreateCategoryComponent),
+    loadComponent: () =>
+      import('./modules/products/forms/create-category').then((m) => m.CreateCategoryComponent),
     canActivate: [authGuard],
   },
   {
     path: 'create-subcategory',
-    loadComponent: () => import('./modules/products/forms/create-subcategory').then((m) => m.CreateSubcategoryComponent),
+    loadComponent: () =>
+      import('./modules/products/forms/create-subcategory').then(
+        (m) => m.CreateSubcategoryComponent,
+      ),
     canActivate: [authGuard],
   },
   { path: '**', redirectTo: '' },

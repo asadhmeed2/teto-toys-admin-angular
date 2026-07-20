@@ -1,15 +1,17 @@
-import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef, HostListener } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
+import { UpperCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CreateProductApiService, PartDto } from './services/create-product-api.service';
 import { Category } from '../create-category/services/create-category-api.service';
 import { Subcategory } from '../create-subcategory/services/create-subcategory-api.service';
+import { LanguageApiService, SystemLanguage } from '../../../../../shared/services/language-api.service';
 
 @Component({
   selector: 'app-create-product',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, UpperCasePipe],
   providers: [CreateProductApiService],
   templateUrl: './create-product.component.html',
   styleUrl: './create-product.component.scss',
@@ -47,13 +49,37 @@ export class CreateProductComponent implements OnInit {
   protected readonly successMessage = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
 
+  // ponytail: language selector state — dropdown open/close + available languages + selected
+  protected readonly languages = signal<SystemLanguage[]>([]);
+  protected readonly selectedLanguage = signal<SystemLanguage | null>(null);
+  protected readonly langMenuOpen = signal(false);
+
   private readonly apiService = inject(CreateProductApiService);
+  private readonly languageApi = inject(LanguageApiService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('#lang-selector-wrapper')) {
+      this.langMenuOpen.set(false);
+    }
+  }
+
+  selectLanguage(lang: SystemLanguage): void {
+    this.selectedLanguage.set(lang);
+    this.langMenuOpen.set(false);
+  }
+
+  toggleLangMenu(): void {
+    this.langMenuOpen.update(v => !v);
+  }
 
   ngOnInit(): void {
     this.loadParts(true);
     this.loadMetadata();
+    this.loadLanguages();
     // ponytail: add a default empty image URL input
     this.addImageUrl();
 
@@ -78,6 +104,18 @@ export class CreateProductComponent implements OnInit {
     this.imageUrlsArray.removeAt(index);
     if (this.imageUrlsArray.length === 0) {
       this.addImageUrl();
+    }
+  }
+
+  // ponytail: fetch system languages and default to 'en'
+  private async loadLanguages(): Promise<void> {
+    try {
+      const langs = await this.languageApi.getLanguages();
+      this.languages.set(langs);
+      const defaultLang = langs.find(l => l.code === 'en') ?? langs[0] ?? null;
+      this.selectedLanguage.set(defaultLang);
+    } catch {
+      // non-fatal — form still works, defaults to 'en' on submit
     }
   }
 
@@ -166,7 +204,8 @@ export class CreateProductComponent implements OnInit {
         subcategory: val.subcategory || undefined,
         price: val.price ?? 0,
         part_ids: val.partIds,
-        image_urls: filteredImages
+        image_urls: filteredImages,
+        language: this.selectedLanguage()?.code ?? 'en',
       });
 
       this.successMessage.set('Product created successfully.');
