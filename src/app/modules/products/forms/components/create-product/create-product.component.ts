@@ -7,6 +7,7 @@ import { CreateProductApiService, PartDto } from './services/create-product-api.
 import { Category } from '@modules/products/forms/components/create-category/services/create-category-api.service';
 import { Subcategory } from '@modules/products/forms/components/create-subcategory/services/create-subcategory-api.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
+import { languageScriptValidator } from '@shared/utils/language-script';
 
 @Component({
   selector: 'app-create-product',
@@ -70,6 +71,15 @@ export class CreateProductComponent implements OnInit {
   selectLanguage(lang: SystemLanguage): void {
     this.selectedLanguage.set(lang);
     this.langMenuOpen.set(false);
+    // ponytail: re-run script validators with the new language code
+    this.revalidateTextFields();
+  }
+
+  /** Re-runs the script validators on all translatable text controls. */
+  private revalidateTextFields(): void {
+    this.form.controls.title.updateValueAndValidity();
+    this.form.controls.subtitle.updateValueAndValidity();
+    this.form.controls.description.updateValueAndValidity();
   }
 
   toggleLangMenu(): void {
@@ -82,6 +92,12 @@ export class CreateProductComponent implements OnInit {
     this.loadLanguages();
     // ponytail: add a default empty image URL input
     this.addImageUrl();
+
+    // ponytail: attach language-script validators after init so `this` is available
+    const getLang = () => this.selectedLanguage()?.code ?? 'en';
+    this.form.controls.title.addValidators(languageScriptValidator(getLang));
+    this.form.controls.subtitle.addValidators(languageScriptValidator(getLang));
+    this.form.controls.description.addValidators(languageScriptValidator(getLang));
 
     // ponytail: reset subcategory when category changes and track selection
     this.form.controls.category.valueChanges

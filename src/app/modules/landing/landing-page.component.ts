@@ -7,6 +7,7 @@ import { AuthService } from '@shared/services/auth.service';
 import { PermissionsService } from '@shared/services/permissions.service';
 import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
+import { languageScriptValidator } from '@shared/utils/language-script';
 
 import {
   Subcategory,
@@ -115,7 +116,7 @@ export class LandingPageComponent implements OnInit {
     this.editLangMenuOpen.update(v => !v);
   }
 
-  // ponytail: select a language and reload the product's translation row for that language
+  // ponytail: select a language, reload the product's translation row, then re-validate script
   async selectEditLanguage(lang: SystemLanguage): Promise<void> {
     this.editLang.set(lang);
     this.editLangMenuOpen.set(false);
@@ -131,9 +132,19 @@ export class LandingPageComponent implements OnInit {
         description: product.description || '',
       });
     } catch {
-      // non-fatal — translation may not exist yet for this language
+      // non-fatal — translation may not exist yet for this language; clear fields so user fills them in
       this.editForm.patchValue({ title: '', subtitle: '', description: '' });
     }
+
+    // re-run script validators with the new language code
+    this.revalidateEditTextFields();
+  }
+
+  /** Re-runs the script validators on all translatable edit-form controls. */
+  private revalidateEditTextFields(): void {
+    this.editForm.controls.title.updateValueAndValidity();
+    this.editForm.controls.subtitle.updateValueAndValidity();
+    this.editForm.controls.description.updateValueAndValidity();
   }
 
   protected toggleMenu(): void {
@@ -151,6 +162,12 @@ export class LandingPageComponent implements OnInit {
 
     // Load initial metadata, product lists, and system languages in parallel
     await Promise.all([this.loadMetadata(), this.loadProducts(), this.loadLanguages()]);
+
+    // ponytail: attach language-script validators to translatable edit-form fields
+    const getEditLang = () => this.editLang()?.code ?? 'en';
+    this.editForm.controls.title.addValidators(languageScriptValidator(getEditLang));
+    this.editForm.controls.subtitle.addValidators(languageScriptValidator(getEditLang));
+    this.editForm.controls.description.addValidators(languageScriptValidator(getEditLang));
 
     // ponytail: reset subcategory when category changes and track selection
     this.editForm.controls.category.valueChanges
