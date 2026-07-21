@@ -1,11 +1,16 @@
-﻿import { Component, inject, signal, computed, OnInit, DestroyRef, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+﻿import {
+  Component,
+  inject,
+  signal,
+  computed,
+  OnInit,
+  DestroyRef,
+  HostListener,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
 import { CurrencyPipe, UpperCasePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AuthService } from '@shared/services/auth.service';
 import { PermissionsService } from '@shared/services/permissions.service';
-import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 import { languageScriptValidator } from '@shared/utils/language-script';
 
@@ -18,18 +23,23 @@ import {
 } from '@modules/products/forms/components';
 
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal';
+import { LayoutComponent } from '@shared/layout';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe, UpperCasePipe, ConfirmationModalComponent],
+  imports: [
+    ReactiveFormsModule,
+    CurrencyPipe,
+    UpperCasePipe,
+    ConfirmationModalComponent,
+    LayoutComponent,
+  ],
   providers: [CreateProductApiService],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss',
 })
 export class LandingPageComponent implements OnInit {
-  protected readonly isLoggingOut = signal(false);
-  protected readonly isMenuOpen = signal(false);
   protected readonly permissionsService = inject(PermissionsService);
 
   // Products state signals
@@ -97,11 +107,9 @@ export class LandingPageComponent implements OnInit {
     return this.subcategories().filter((sub) => sub.category_id === +catId);
   });
 
-  private readonly authService = inject(AuthService);
-  private readonly authApiService = inject(AdminAuthApiService);
   private readonly productApiService = inject(CreateProductApiService);
   private readonly languageApi = inject(LanguageApiService);
-  private readonly router = inject(Router);
+
   private readonly destroyRef = inject(DestroyRef);
 
   @HostListener('document:click', ['$event'])
@@ -113,7 +121,7 @@ export class LandingPageComponent implements OnInit {
   }
 
   toggleEditLangMenu(): void {
-    this.editLangMenuOpen.update(v => !v);
+    this.editLangMenuOpen.update((v) => !v);
   }
 
   // ponytail: select a language, reload the product's translation row, then re-validate script
@@ -145,10 +153,6 @@ export class LandingPageComponent implements OnInit {
     this.editForm.controls.title.updateValueAndValidity();
     this.editForm.controls.subtitle.updateValueAndValidity();
     this.editForm.controls.description.updateValueAndValidity();
-  }
-
-  protected toggleMenu(): void {
-    this.isMenuOpen.update((open) => !open);
   }
 
   async ngOnInit(): Promise<void> {
@@ -183,7 +187,7 @@ export class LandingPageComponent implements OnInit {
     try {
       const langs = await this.languageApi.getLanguages();
       this.languages.set(langs);
-      const defaultLang = langs.find(l => l.code === 'en') ?? langs[0] ?? null;
+      const defaultLang = langs.find((l) => l.code === 'en') ?? langs[0] ?? null;
       this.editLang.set(defaultLang);
     } catch {
       // non-fatal
@@ -375,12 +379,15 @@ export class LandingPageComponent implements OnInit {
 
     // ponytail: reset language to 'en' (or first available) when opening a fresh edit session
     const langs = this.languages();
-    const defaultLang = langs.find(l => l.code === 'en') ?? langs[0] ?? null;
+    const defaultLang = langs.find((l) => l.code === 'en') ?? langs[0] ?? null;
     this.editLang.set(defaultLang);
 
     try {
       // 1. Fetch product detail with connected parts in the selected language
-      const product = await this.productApiService.getProduct(productId, this.editLang()?.code ?? 'en');
+      const product = await this.productApiService.getProduct(
+        productId,
+        this.editLang()?.code ?? 'en',
+      );
 
       // 2. Setup forms values
       this.editForm.patchValue({
@@ -469,33 +476,5 @@ export class LandingPageComponent implements OnInit {
     } finally {
       this.isSaving.set(false);
     }
-  }
-
-  protected async logout(): Promise<void> {
-    this.isLoggingOut.set(true);
-    await this.authApiService.logout();
-    this.authService.clearToken();
-    this.permissionsService.clearPermissions();
-    this.router.navigate(['/login']);
-  }
-
-  protected navigateToCreateUser(): void {
-    this.router.navigate(['/create-user']);
-  }
-
-  protected navigateToCreateProduct(): void {
-    this.router.navigate(['/create-product']);
-  }
-
-  protected navigateToCreatePart(): void {
-    this.router.navigate(['/create-part']);
-  }
-
-  protected navigateToCreateCategory(): void {
-    this.router.navigate(['/create-category']);
-  }
-
-  protected navigateToCreateSubcategory(): void {
-    this.router.navigate(['/create-subcategory']);
   }
 }
