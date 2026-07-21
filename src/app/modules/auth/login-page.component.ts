@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminAuthApiService } from './services/admin-auth-api.service';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from '@shared/services/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -12,8 +12,14 @@ import { AuthService } from '../../shared/services/auth.service';
 })
 export class LoginPageComponent {
   protected readonly form = new FormGroup({
-    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
-    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(8)] }),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email],
+    }),
+    password: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(8)],
+    }),
   });
 
   protected readonly isLoading = signal(false);

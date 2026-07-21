@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { parseHttpError } from '../../../shared/utils/error';
-import { API_BASE_URL } from '../../../shared/config/api.config';
+import { parseHttpError } from '@shared/utils/error';
+import { API_BASE_URL } from '@shared/config/api.config';
 
 export interface LoginResponse {
   access_token: string;
@@ -19,7 +19,11 @@ export class AdminAuthApiService {
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
       return await firstValueFrom(
-        this.http.post<LoginResponse>(`${this.baseUrl}/login`, { email, password }, { withCredentials: true })
+        this.http.post<LoginResponse>(
+          `${this.baseUrl}/login`,
+          { email, password },
+          { withCredentials: true },
+        ),
       );
     } catch (err) {
       throw parseHttpError(err, 'Login failed');
@@ -38,8 +42,8 @@ export class AdminAuthApiService {
     try {
       return await firstValueFrom(
         this.http.get<any>(`${this.baseUrl}/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+          headers: { Authorization: `Bearer ${token}` },
+        }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Validation failed');
@@ -49,7 +53,7 @@ export class AdminAuthApiService {
   async refreshAccessToken(): Promise<LoginResponse> {
     try {
       return await firstValueFrom(
-        this.http.post<LoginResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
+        this.http.post<LoginResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Refresh failed');

@@ -3,17 +3,19 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AuthService } from '../../shared/services/auth.service';
-import { PermissionsService } from '../../shared/services/permissions.service';
-import { AdminAuthApiService } from '../auth/services/admin-auth-api.service';
+import { AuthService } from '@shared/services/auth.service';
+import { PermissionsService } from '@shared/services/permissions.service';
+import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
+
 import {
+  Subcategory,
+  Category,
   CreateProductApiService,
   CreateProductResponse,
   PartDto,
-} from '../products/forms//components/create-product/services/create-product-api.service';
-import { Category } from '../products/forms/components/create-category/services/create-category-api.service';
-import { Subcategory } from '../products/forms/components/create-subcategory/services/create-subcategory-api.service';
-import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal';
+} from '../products/forms/components';
+
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal';
 
 @Component({
   selector: 'app-landing-page',
