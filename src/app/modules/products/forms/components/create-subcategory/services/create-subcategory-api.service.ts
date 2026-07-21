@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { parseHttpError } from '../../../../../../shared/utils/error';
-import { API_BASE_URL } from '../../../../../../shared/config/api.config';
-import { Category } from '../../create-category/services/create-category-api.service';
+import { parseHttpError } from '@shared/utils/error';
+import { API_BASE_URL } from '@shared/config/api.config';
+import { Category } from '@modules/products/forms/components/create-category/services/create-category-api.service';
 
 export interface Subcategory {
   id: number;

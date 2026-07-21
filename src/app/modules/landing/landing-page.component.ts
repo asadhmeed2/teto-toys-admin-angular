@@ -13,7 +13,7 @@ import {
   CreateProductApiService,
   CreateProductResponse,
   PartDto,
-} from '../products/forms/components';
+} from '@modules/products/forms/components';
 
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal';
 

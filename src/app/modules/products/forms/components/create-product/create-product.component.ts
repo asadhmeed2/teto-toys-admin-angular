@@ -4,9 +4,9 @@ import { UpperCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CreateProductApiService, PartDto } from './services/create-product-api.service';
-import { Category } from '../create-category/services/create-category-api.service';
-import { Subcategory } from '../create-subcategory/services/create-subcategory-api.service';
-import { LanguageApiService, SystemLanguage } from '../../../../../shared/services/language-api.service';
+import { Category } from '@modules/products/forms/components/create-category/services/create-category-api.service';
+import { Subcategory } from '@modules/products/forms/components/create-subcategory/services/create-subcategory-api.service';
+import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 
 @Component({
   selector: 'app-create-product',

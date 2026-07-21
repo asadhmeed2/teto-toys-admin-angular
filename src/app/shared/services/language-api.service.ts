@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { API_BASE_URL } from '../config/api.config';
-import { parseHttpError } from '../utils/error';
+import { API_BASE_URL } from '@shared/config/api.config';
+import { parseHttpError } from '@shared/utils/error';
 
 export interface SystemLanguage {
   code: string;

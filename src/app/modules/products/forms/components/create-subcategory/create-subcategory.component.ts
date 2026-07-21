@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CreateSubcategoryApiService } from './services/create-subcategory-api.service';
-import { Category } from '../create-category/services/create-category-api.service';
+import { Category } from '@modules/products/forms/components/create-category/services/create-category-api.service';
 
 @Component({
   selector: 'app-create-subcategory',

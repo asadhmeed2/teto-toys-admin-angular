@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
-import { AdminAuthApiService } from '../../modules/auth/services/admin-auth-api.service';
+import { AuthService } from '@shared/services/auth.service';
+import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
 import { BehaviorSubject, throwError, from } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { Router } from '@angular/router';
