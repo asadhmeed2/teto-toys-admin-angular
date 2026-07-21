@@ -1,11 +1,12 @@
-﻿import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+﻿import { Component, inject, signal, computed, OnInit, DestroyRef, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, UpperCasePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '@shared/services/auth.service';
 import { PermissionsService } from '@shared/services/permissions.service';
 import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
+import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 
 import {
   Subcategory,
@@ -20,7 +21,7 @@ import { ConfirmationModalComponent } from '@shared/components/confirmation-moda
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [ReactiveFormsModule, CurrencyPipe, ConfirmationModalComponent],
+  imports: [ReactiveFormsModule, CurrencyPipe, UpperCasePipe, ConfirmationModalComponent],
   providers: [CreateProductApiService],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss',
@@ -66,6 +67,11 @@ export class LandingPageComponent implements OnInit {
   protected readonly isDeleteModalOpen = signal(false);
   protected readonly pendingDeleteProduct = signal<{ id: string; title: string } | null>(null);
 
+  // ponytail: language selector state for the edit modal — controls which translation is loaded/saved
+  protected readonly languages = signal<SystemLanguage[]>([]);
+  protected readonly editLang = signal<SystemLanguage | null>(null);
+  protected readonly editLangMenuOpen = signal(false);
+
   // Form group definition
   protected readonly editForm = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -93,8 +99,42 @@ export class LandingPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly authApiService = inject(AdminAuthApiService);
   private readonly productApiService = inject(CreateProductApiService);
+  private readonly languageApi = inject(LanguageApiService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('#edit-lang-wrapper')) {
+      this.editLangMenuOpen.set(false);
+    }
+  }
+
+  toggleEditLangMenu(): void {
+    this.editLangMenuOpen.update(v => !v);
+  }
+
+  // ponytail: select a language and reload the product's translation row for that language
+  async selectEditLanguage(lang: SystemLanguage): Promise<void> {
+    this.editLang.set(lang);
+    this.editLangMenuOpen.set(false);
+
+    const productId = this.editingProductId();
+    if (!productId) return;
+
+    try {
+      const product = await this.productApiService.getProduct(productId, lang.code);
+      this.editForm.patchValue({
+        title: product.title,
+        subtitle: product.subtitle || '',
+        description: product.description || '',
+      });
+    } catch {
+      // non-fatal — translation may not exist yet for this language
+      this.editForm.patchValue({ title: '', subtitle: '', description: '' });
+    }
+  }
 
   protected toggleMenu(): void {
     this.isMenuOpen.update((open) => !open);
@@ -109,8 +149,8 @@ export class LandingPageComponent implements OnInit {
       // best effort
     }
 
-    // Load initial metadata and product lists
-    await Promise.all([this.loadMetadata(), this.loadProducts()]);
+    // Load initial metadata, product lists, and system languages in parallel
+    await Promise.all([this.loadMetadata(), this.loadProducts(), this.loadLanguages()]);
 
     // ponytail: reset subcategory when category changes and track selection
     this.editForm.controls.category.valueChanges
@@ -119,6 +159,18 @@ export class LandingPageComponent implements OnInit {
         this.selectedCategory.set(val);
         this.editForm.controls.subcategory.setValue(null);
       });
+  }
+
+  // ponytail: fetch system languages once; default to 'en' for the edit modal
+  private async loadLanguages(): Promise<void> {
+    try {
+      const langs = await this.languageApi.getLanguages();
+      this.languages.set(langs);
+      const defaultLang = langs.find(l => l.code === 'en') ?? langs[0] ?? null;
+      this.editLang.set(defaultLang);
+    } catch {
+      // non-fatal
+    }
   }
 
   // Load categories and subcategories
@@ -304,9 +356,14 @@ export class LandingPageComponent implements OnInit {
     this.isSaving.set(false);
     this.editingProductId.set(productId);
 
+    // ponytail: reset language to 'en' (or first available) when opening a fresh edit session
+    const langs = this.languages();
+    const defaultLang = langs.find(l => l.code === 'en') ?? langs[0] ?? null;
+    this.editLang.set(defaultLang);
+
     try {
-      // 1. Fetch product detail with connected parts
-      const product = await this.productApiService.getProduct(productId);
+      // 1. Fetch product detail with connected parts in the selected language
+      const product = await this.productApiService.getProduct(productId, this.editLang()?.code ?? 'en');
 
       // 2. Setup forms values
       this.editForm.patchValue({
@@ -368,6 +425,7 @@ export class LandingPageComponent implements OnInit {
     try {
       const filteredImages = val.imageUrls.filter((url) => !!url.trim());
 
+      // ponytail: language determines which product_translations row is upserted on the backend
       await this.productApiService.updateProduct(productId, {
         title: val.title.trim(),
         subtitle: val.subtitle.trim() || undefined,
@@ -377,6 +435,7 @@ export class LandingPageComponent implements OnInit {
         price: val.price ?? 0,
         part_ids: val.partIds,
         image_urls: filteredImages,
+        language: this.editLang()?.code ?? 'en',
       });
 
       this.editSuccessMessage.set('Product updated successfully!');

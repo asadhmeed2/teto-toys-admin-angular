@@ -124,12 +124,13 @@ export class CreateProductApiService {
     }
   }
 
-  async getProduct(productId: string): Promise<CreateProductResponse & { part_ids: string[] }> {
+  async getProduct(productId: string, language = 'en'): Promise<CreateProductResponse & { part_ids: string[] }> {
     try {
+      // ponytail: pass language so the API returns the translation row for that language
       return await firstValueFrom(
         this.http.get<CreateProductResponse & { part_ids: string[] }>(
           `${this.baseUrl}/products/${productId}`,
-          { withCredentials: true },
+          { params: new HttpParams().set('language', language), withCredentials: true },
         ),
       );
     } catch (err) {
