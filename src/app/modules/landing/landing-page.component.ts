@@ -24,6 +24,7 @@ import {
 
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal';
 import { LayoutComponent } from '@shared/layout';
+import { ProductsListTableComponent } from '@modules/products/components/products-list-table';
 
 @Component({
   selector: 'app-landing-page',
@@ -34,6 +35,7 @@ import { LayoutComponent } from '@shared/layout';
     UpperCasePipe,
     ConfirmationModalComponent,
     LayoutComponent,
+    ProductsListTableComponent,
   ],
   providers: [CreateProductApiService],
   templateUrl: './landing-page.component.html',
@@ -237,8 +239,7 @@ export class LandingPageComponent implements OnInit {
     }
   }
 
-  protected onProductsSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
+  protected onSearchChange(value: string): void {
     this.productsSearch.set(value);
     this.productsPage.set(1);
     this.loadProducts();

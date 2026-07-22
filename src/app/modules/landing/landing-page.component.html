@@ -113,198 +113,23 @@
     </div>
 
     <!-- Products section -->
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center justify-between gap-4">
-        <h2
-          class="text-xl font-bold m-0 text-[var(--text-primary)] [font-family:var(--font-display)]"
-        >
-          Products
-        </h2>
-        <input
-          type="text"
-          placeholder="Search products..."
-          (input)="onProductsSearch($event)"
-          class="w-64 px-3.5 py-2 rounded-lg text-sm bg-[var(--bg-secondary)] border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand-green)]"
-        />
-      </div>
-
-      <!-- Table -->
-      <div class="rounded-xl border border-[var(--border-glass)] overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-[var(--border-glass)] bg-[var(--bg-secondary)]">
-                <th
-                  class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
-                  Title
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
-                  Subtitle
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
-                  Category
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
-                  Price
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
-                  Images
-                </th>
-                <th
-                  class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[var(--border-glass)]">
-              @for (prod of products(); track prod.product_id) {
-                <tr
-                  class="transition-colors hover:bg-[var(--bg-secondary)]"
-                  [class.bg-[rgba(255,51,77,0.03)]]="prod.is_deleted"
-                >
-                  <td
-                    class="px-4 py-3 text-sm font-semibold text-[var(--text-primary)] whitespace-nowrap"
-                  >
-                    {{ prod.title }}
-                    @if (prod.is_deleted) {
-                      <span
-                        class="ml-1.5 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded text-[var(--brand-red)]"
-                        style="background: rgba(255, 51, 77, 0.12)"
-                        >(Deleted)</span
-                      >
-                    }
-                  </td>
-                  <td class="px-4 py-3 text-sm text-[var(--text-secondary)] max-w-[180px] truncate">
-                    {{ prod.subtitle || '—' }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
-                    {{ categoryMap()[prod.category] || 'ID: ' + prod.category }}
-                  </td>
-                  <td
-                    class="px-4 py-3 text-sm font-semibold whitespace-nowrap text-[var(--brand-green)]"
-                  >
-                    {{ prod.price | currency }}
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5">
-                      @for (url of prod.image_urls; track $index) {
-                        <img
-                          [src]="url"
-                          alt="Thumbnail"
-                          (click)="openImagePreview(url)"
-                          class="w-9 h-9 rounded-lg object-cover border border-[var(--border-glass)] cursor-pointer hover:scale-110 transition-transform"
-                        />
-                      } @empty {
-                        <span class="text-xs text-[var(--text-muted)]">No images</span>
-                      }
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-2">
-                      <button
-                        (click)="openEditModal(prod.product_id)"
-                        class="px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all text-white hover:shadow-[0_2px_8px_rgba(59,130,246,0.3)]"
-                        style="background: rgba(59, 130, 246, 0.85)"
-                      >
-                        Edit
-                      </button>
-                      @if (!prod.is_deleted) {
-                        <button
-                          [disabled]="togglingDisplayProductId() === prod.product_id"
-                          (click)="
-                            toggleProductDisplay(prod.product_id, prod.is_displayed !== false)
-                          "
-                          class="px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all disabled:opacity-50"
-                          [class.text-[var(--brand-green)]]="prod.is_displayed === false"
-                          [class.text-[#f59e0b]]="prod.is_displayed !== false"
-                          [style]="
-                            prod.is_displayed === false
-                              ? 'background: rgba(8,184,128,0.12);'
-                              : 'background: rgba(245,158,11,0.12);'
-                          "
-                        >
-                          {{
-                            togglingDisplayProductId() === prod.product_id
-                              ? '...'
-                              : prod.is_displayed === false
-                                ? 'Show'
-                                : 'Hide'
-                          }}
-                        </button>
-                        <button
-                          [disabled]="deletingProductId() === prod.product_id"
-                          (click)="deleteProduct(prod.product_id, prod.title)"
-                          class="px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all text-[var(--brand-red)] disabled:opacity-50 hover:shadow-[0_2px_8px_rgba(255,51,77,0.25)]"
-                          style="background: rgba(255, 51, 77, 0.12)"
-                        >
-                          {{ deletingProductId() === prod.product_id ? 'Deleting...' : 'Delete' }}
-                        </button>
-                      }
-                      @if (prod.is_deleted) {
-                        <button
-                          [disabled]="restoringProductId() === prod.product_id"
-                          (click)="restoreProduct(prod.product_id)"
-                          class="px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all text-[var(--brand-green)] disabled:opacity-50 hover:shadow-[0_2px_8px_rgba(8,184,128,0.25)]"
-                          style="background: rgba(8, 184, 128, 0.12)"
-                        >
-                          {{ restoringProductId() === prod.product_id ? 'Restoring...' : 'Restore' }}
-                        </button>
-                      }
-                    </div>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td
-                    colspan="6"
-                    class="px-4 py-12 text-center text-sm text-[var(--text-secondary)]"
-                  >
-                    @if (isProductsLoading()) {
-                      Loading products...
-                    } @else {
-                      No products found.
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      @if (productsTotalPages() > 1) {
-        <div class="flex items-center justify-center gap-4">
-          <button
-            [disabled]="productsPage() === 1"
-            (click)="changeProductsPage(-1)"
-            class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Previous
-          </button>
-          <span class="text-sm text-[var(--text-secondary)]"
-            >Page {{ productsPage() }} of {{ productsTotalPages() }}</span
-          >
-          <button
-            [disabled]="productsPage() === productsTotalPages()"
-            (click)="changeProductsPage(1)"
-            class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Next
-          </button>
-        </div>
-      }
-    </div>
+    <app-products-list-table
+      [products]="products()"
+      [categoryMap]="categoryMap()"
+      [productsPage]="productsPage()"
+      [productsTotalPages]="productsTotalPages()"
+      [isLoading]="isProductsLoading()"
+      [deletingProductId]="deletingProductId()"
+      [togglingDisplayProductId]="togglingDisplayProductId()"
+      [restoringProductId]="restoringProductId()"
+      (searchChange)="onSearchChange($event)"
+      (pageChange)="changeProductsPage($event)"
+      (editProduct)="openEditModal($event)"
+      (previewImage)="openImagePreview($event)"
+      (displayToggle)="toggleProductDisplay($event.productId, $event.currentIsDisplayed)"
+      (productDelete)="deleteProduct($event.id, $event.title)"
+      (productRestore)="restoreProduct($event)"
+    />
   </main>
 </app-layout>
 
