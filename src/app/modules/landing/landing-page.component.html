@@ -251,6 +251,16 @@
                           {{ deletingProductId() === prod.product_id ? 'Deleting...' : 'Delete' }}
                         </button>
                       }
+                      @if (prod.is_deleted) {
+                        <button
+                          [disabled]="restoringProductId() === prod.product_id"
+                          (click)="restoreProduct(prod.product_id)"
+                          class="px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all text-[var(--brand-green)] disabled:opacity-50 hover:shadow-[0_2px_8px_rgba(8,184,128,0.25)]"
+                          style="background: rgba(8, 184, 128, 0.12)"
+                        >
+                          {{ restoringProductId() === prod.product_id ? 'Restoring...' : 'Restore' }}
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>

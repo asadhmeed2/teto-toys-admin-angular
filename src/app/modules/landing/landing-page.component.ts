@@ -51,6 +51,7 @@ export class LandingPageComponent implements OnInit {
   protected readonly isProductsLoading = signal(false);
   protected readonly deletingProductId = signal<string | null>(null);
   protected readonly togglingDisplayProductId = signal<string | null>(null);
+  protected readonly restoringProductId = signal<string | null>(null);
 
   // Category & Subcategory lookup lists
   protected readonly categories = signal<Category[]>([]);
@@ -275,6 +276,24 @@ export class LandingPageComponent implements OnInit {
     } finally {
       this.deletingProductId.set(null);
       this.pendingDeleteProduct.set(null);
+    }
+  }
+
+  protected async restoreProduct(productId: string): Promise<void> {
+    if (this.restoringProductId()) return;
+    this.restoringProductId.set(productId);
+    try {
+      await this.productApiService.restoreProduct(productId);
+      // Optimistic update so the row switches back immediately
+      this.products.update((list) =>
+        list.map((p) => (p.product_id === productId ? { ...p, is_deleted: false } : p)),
+      );
+      // Reload from server to confirm the DB change persisted
+      await this.loadProducts();
+    } catch (err: any) {
+      alert(err.message || 'Failed to restore product.');
+    } finally {
+      this.restoringProductId.set(null);
     }
   }
 

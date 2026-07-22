@@ -167,6 +167,17 @@ export class CreateProductApiService {
     }
   }
 
+  // ponytail: restore — clears is_deleted flag, product becomes active again
+  async restoreProduct(productId: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.patch<void>(`${this.baseUrl}/products/${productId}/restore`, {}, { withCredentials: true }),
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to restore product');
+    }
+  }
+
   // ponytail: soft delete — backend flips is_deleted, row stays in the DB
   async deleteProduct(productId: string): Promise<void> {
     try {
