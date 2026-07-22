@@ -170,7 +170,6 @@
               @for (prod of products(); track prod.product_id) {
                 <tr
                   class="transition-colors hover:bg-[var(--bg-secondary)]"
-                  [class.opacity-50]="prod.is_deleted"
                   [class.bg-[rgba(255,51,77,0.03)]]="prod.is_deleted"
                 >
                   <td
