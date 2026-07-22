@@ -60,6 +60,7 @@
             >
               <td
                 class="px-4 py-3 text-sm font-semibold text-[var(--text-primary)] whitespace-nowrap"
+                [class.opacity-50]="prod.is_deleted"
               >
                 {{ prod.title }}
                 @if (prod.is_deleted) {
@@ -70,18 +71,21 @@
                   >
                 }
               </td>
-              <td class="px-4 py-3 text-sm text-[var(--text-secondary)] max-w-[180px] truncate">
+              <td class="px-4 py-3 text-sm text-[var(--text-secondary)] max-w-[180px] truncate"
+                [class.opacity-50]="prod.is_deleted">
                 {{ prod.subtitle || '—' }}
               </td>
-              <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+              <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap"
+                [class.opacity-50]="prod.is_deleted">
                 {{ categoryMap()[prod.category] || 'ID: ' + prod.category }}
               </td>
               <td
                 class="px-4 py-3 text-sm font-semibold whitespace-nowrap text-[var(--brand-green)]"
+                [class.opacity-50]="prod.is_deleted"
               >
                 {{ prod.price | currency }}
               </td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-3" [class.opacity-50]="prod.is_deleted">
                 <div class="flex items-center gap-1.5">
                   @for (url of prod.image_urls; track $index) {
                     <img
