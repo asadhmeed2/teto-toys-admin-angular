@@ -61,8 +61,7 @@ export class CategoriesListComponent implements OnInit {
     this.deletingId.set(cat.id);
     try {
       await this.categoriesApi.deleteCategory(cat.id);
-      // Remove from local list immediately
-      this.categories.update((list) => list.filter((c) => c.id !== cat.id));
+      await this.loadCategories();
     } catch (err: any) {
       this.errorMessage.set(err.message || 'Failed to delete category.');
     } finally {
