@@ -25,6 +25,7 @@ import {
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal';
 import { LayoutComponent } from '@shared/layout';
 import { ProductsListTableComponent } from '@modules/products/components/products-list-table';
+import { CategoriesListComponent } from './components/categories-list';
 
 @Component({
   selector: 'app-landing-page',
@@ -36,6 +37,7 @@ import { ProductsListTableComponent } from '@modules/products/components/product
     ConfirmationModalComponent,
     LayoutComponent,
     ProductsListTableComponent,
+    CategoriesListComponent,
   ],
   providers: [CreateProductApiService],
   templateUrl: './landing-page.component.html',

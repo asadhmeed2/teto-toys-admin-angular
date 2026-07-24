@@ -1,0 +1,100 @@
+<div class="flex flex-col gap-4">
+  <div class="flex items-center justify-between gap-4">
+    <h2 class="text-xl font-bold m-0 text-[var(--text-primary)] [font-family:var(--font-display)]">
+      Categories
+    </h2>
+    <button
+      (click)="loadCategories()"
+      [disabled]="isLoading()"
+      class="px-3.5 py-2 rounded-lg text-xs font-semibold border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-50"
+    >
+      {{ isLoading() ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div
+      class="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-[var(--brand-red)]"
+      style="background: rgba(255,51,77,0.1); border: 1px solid rgba(255,51,77,0.3)"
+    >
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="rounded-xl border border-[var(--border-glass)] overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-[var(--border-glass)] bg-[var(--bg-secondary)]">
+            <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+              Name
+            </th>
+            <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+              Slug
+            </th>
+            <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+              Active Products
+            </th>
+            @if (permissionsService.permissions()?.userCreation) {
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                Actions
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border-glass)]">
+          @for (cat of categories(); track cat.id) {
+            <tr class="transition-colors hover:bg-[var(--bg-secondary)]">
+              <td class="px-4 py-3 text-sm font-semibold text-[var(--text-primary)] whitespace-nowrap">
+                {{ cat.name }}
+              </td>
+              <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap font-mono">
+                {{ cat.slug }}
+              </td>
+              <td class="px-4 py-3 text-sm font-semibold whitespace-nowrap text-[var(--brand-green)]">
+                {{ cat.number_of_active_products }}
+              </td>
+              @if (permissionsService.permissions()?.userCreation) {
+                <td class="px-4 py-3">
+                  <button
+                    [disabled]="deletingId() === cat.id || cat.slug === 'general'"
+                    (click)="requestDelete(cat)"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all text-[var(--brand-red)] disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_2px_8px_rgba(255,51,77,0.25)]"
+                    style="background: rgba(255, 51, 77, 0.12)"
+                    [title]="cat.slug === 'general' ? 'The General category cannot be deleted' : 'Delete category'"
+                  >
+                    {{ deletingId() === cat.id ? 'Deleting...' : 'Delete' }}
+                  </button>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td
+                colspan="4"
+                class="px-4 py-12 text-center text-sm text-[var(--text-secondary)]"
+              >
+                @if (isLoading()) {
+                  Loading categories...
+                } @else {
+                  No categories found.
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-confirmation-modal
+  [open]="isDeleteModalOpen()"
+  title="Delete Category"
+  [message]="'Delete \'' + (pendingDelete()?.name ?? '') + '\'? All its subcategories and products will be moved to the General category.'"
+  confirmText="Delete"
+  cancelText="Cancel"
+  [danger]="true"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>
