@@ -44,7 +44,7 @@ export class LoginPageComponent {
     try {
       const { email, password } = this.form.getRawValue();
       const res = await this.apiService.login(email, password);
-      this.authService.setToken(res.access_token);
+      this.authService.setToken(res.access_token, res.expires_in);
       this.router.navigate(['']);
     } catch (err: any) {
       this.errorMessage.set(err.message || 'An error occurred. Please try again.');

@@ -2,11 +2,12 @@ import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from
 import { inject } from '@angular/core';
 import { AuthService } from '@shared/services/auth.service';
 import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
-import { BehaviorSubject, throwError, from } from 'rxjs';
-import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, throwError, from, EMPTY } from 'rxjs';
+import { catchError, filter, switchMap, take, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
-let isRefreshing = false;
+// Module-level flag shared across all interceptor invocations.
+// Using authService.isRefreshing (same object) keeps proactive + reactive in sync.
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -34,42 +35,46 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-function addTokenHeader(request: HttpRequest<any>, token: string) {
-  return request.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
+function addTokenHeader(request: HttpRequest<unknown>, token: string) {
+  return request.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
 }
 
 function handle401Error(
-  request: HttpRequest<any>,
+  request: HttpRequest<unknown>,
   next: HttpHandlerFn,
   authService: AuthService,
   authApiService: AdminAuthApiService,
-  router: Router
+  router: Router,
 ) {
-  if (!isRefreshing) {
-    isRefreshing = true;
+  if (!authService.isRefreshing) {
+    // Mark refresh in progress — blocks both this path and the proactive timer
+    authService.isRefreshing = true;
     refreshTokenSubject.next(null);
 
     return from(authApiService.refreshAccessToken()).pipe(
       switchMap((res) => {
-        isRefreshing = false;
-        authService.setToken(res.access_token);
+        authService.setToken(res.access_token, res.expires_in);
         refreshTokenSubject.next(res.access_token);
         return next(addTokenHeader(request, res.access_token));
       }),
       catchError((err) => {
-        isRefreshing = false;
+        // Refresh token is invalid/expired → real logout
         authService.clearToken();
         router.navigate(['/login']);
         return throwError(() => err);
-      })
-    );
-  } else {
-    return refreshTokenSubject.pipe(
-      filter((token) => token !== null),
-      take(1),
-      switchMap((token) => next(addTokenHeader(request, token!)))
+      }),
+      finalize(() => {
+        // Always reset the flag — prevents it from getting stuck if the subscriber
+        // is cancelled (component destroyed, navigation, etc.)
+        authService.isRefreshing = false;
+      }),
     );
   }
+
+  // Another refresh is already in flight — queue behind it
+  return refreshTokenSubject.pipe(
+    filter((token) => token !== null),
+    take(1),
+    switchMap((token) => next(addTokenHeader(request, token!))),
+  );
 }
