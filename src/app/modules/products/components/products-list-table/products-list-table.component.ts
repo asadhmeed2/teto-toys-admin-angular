@@ -18,9 +18,11 @@ export class ProductsListTableComponent {
   readonly deletingProductId = input<string | null>(null);
   readonly togglingDisplayProductId = input<string | null>(null);
   readonly restoringProductId = input<string | null>(null);
+  readonly excludeDeleted = input(false);
 
   // ── Outputs ─────────────────────────────────────────────────────────────────
   readonly searchChange = output<string>();
+  readonly excludeDeletedChange = output<boolean>();
   readonly pageChange = output<number>(); // +1 or -1 delta
   readonly editProduct = output<string>(); // productId
   readonly previewImage = output<string>(); // image url
@@ -30,5 +32,9 @@ export class ProductsListTableComponent {
 
   onSearchInput(event: Event): void {
     this.searchChange.emit((event.target as HTMLInputElement).value);
+  }
+
+  onExcludeDeletedChange(event: Event): void {
+    this.excludeDeletedChange.emit((event.target as HTMLInputElement).checked);
   }
 }

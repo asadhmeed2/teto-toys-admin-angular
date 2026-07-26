@@ -6,12 +6,25 @@
     >
       Products
     </h2>
-    <input
-      type="text"
-      placeholder="Search products..."
-      (input)="onSearchInput($event)"
-      class="w-64 px-3.5 py-2 rounded-lg text-sm bg-[var(--bg-secondary)] border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand-green)]"
-    />
+    <div class="flex items-center gap-4">
+      <label
+        class="flex items-center gap-2 text-sm text-[var(--text-secondary)] cursor-pointer select-none"
+      >
+        <input
+          type="checkbox"
+          [checked]="excludeDeleted()"
+          (change)="onExcludeDeletedChange($event)"
+          class="w-4 h-4 cursor-pointer accent-[var(--brand-green)]"
+        />
+        Exclude deleted
+      </label>
+      <input
+        type="text"
+        placeholder="Search products..."
+        (input)="onSearchInput($event)"
+        class="w-64 px-3.5 py-2 rounded-lg text-sm bg-[var(--bg-secondary)] border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand-green)]"
+      />
+    </div>
   </div>
 
   <!-- Table -->

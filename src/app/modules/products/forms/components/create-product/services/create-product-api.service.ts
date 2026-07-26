@@ -105,6 +105,7 @@ export class CreateProductApiService {
     page = 1,
     pageSize = 10,
     search = '',
+    excludeDeleted = false,
   ): Promise<{ items: CreateProductResponse[]; total_count: number; total_pages: number }> {
     try {
       let params = new HttpParams()
@@ -112,6 +113,9 @@ export class CreateProductApiService {
         .set('pageSize', pageSize.toString());
       if (search) {
         params = params.set('search', search);
+      }
+      if (excludeDeleted) {
+        params = params.set('excludeDeleted', 'true');
       }
       return await firstValueFrom(
         this.http.get<{ items: CreateProductResponse[]; total_count: number; total_pages: number }>(

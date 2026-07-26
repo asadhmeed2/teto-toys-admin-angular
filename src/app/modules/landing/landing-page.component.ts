@@ -52,6 +52,7 @@ export class LandingPageComponent implements OnInit {
   protected readonly productsPage = signal(1);
   protected readonly productsTotalPages = signal(1);
   protected readonly productsSearch = signal('');
+  protected readonly excludeDeleted = signal(false);
   protected readonly isProductsLoading = signal(false);
   protected readonly deletingProductId = signal<string | null>(null);
   protected readonly togglingDisplayProductId = signal<string | null>(null);
@@ -230,6 +231,7 @@ export class LandingPageComponent implements OnInit {
         this.productsPage(),
         10,
         this.productsSearch(),
+        this.excludeDeleted(),
       );
       this.products.set(res.items || []);
       this.productsCount.set(res.total_count || 0);
@@ -243,6 +245,12 @@ export class LandingPageComponent implements OnInit {
 
   protected onSearchChange(value: string): void {
     this.productsSearch.set(value);
+    this.productsPage.set(1);
+    this.loadProducts();
+  }
+
+  protected onExcludeDeletedChange(value: boolean): void {
+    this.excludeDeleted.set(value);
     this.productsPage.set(1);
     this.loadProducts();
   }
