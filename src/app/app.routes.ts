@@ -50,5 +50,10 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard],
   },
+  {
+    path: 'store-hours',
+    loadComponent: () => import('./modules/store-hours').then((m) => m.StoreHoursComponent),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

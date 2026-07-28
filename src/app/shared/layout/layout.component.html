@@ -72,6 +72,15 @@
         }
       </div>
 
+      <!-- Store hours -->
+      <button (click)="navigateToStoreHours()" aria-label="Edit store hours"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--brand-green)] hover:border-[rgba(8,184,128,0.3)] transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Store Hours</span>
+      </button>
+
       <!-- Sign out -->
       <button (click)="logout()" [disabled]="isLoggingOut()"
         class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[rgba(255,51,77,0.1)] hover:text-[var(--brand-red)] hover:border-[rgba(255,51,77,0.3)] transition-all disabled:opacity-50">

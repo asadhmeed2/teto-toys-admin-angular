@@ -1,0 +1,131 @@
+<app-layout>
+  <main class="flex-1 px-6 md:px-10 py-8 max-w-4xl w-full mx-auto">
+    <!-- Heading -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold m-0 text-[var(--text-primary)] [font-family:var(--font-display)]">
+          Store Hours
+        </h1>
+        <p class="mt-1 mb-0 text-sm text-[var(--text-secondary)]">
+          Set opening and closing times for each day, or mark a day as closed.
+        </p>
+      </div>
+      <a
+        routerLink="/"
+        class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--border-glass)] no-underline text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-all"
+      >
+        Back
+      </a>
+    </div>
+
+    @if (isLoading()) {
+      <div class="px-4 py-12 text-center text-sm text-[var(--text-secondary)]">
+        Loading store hours...
+      </div>
+    } @else {
+      <form [formGroup]="hoursForm" (ngSubmit)="onSubmit()">
+        <div class="rounded-xl border border-[var(--border-glass)] overflow-hidden">
+          <!-- Column headings -->
+          <div
+            class="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-4 py-3 bg-[var(--bg-secondary)] border-b border-[var(--border-glass)]"
+          >
+            <span class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Day</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] w-28">Opens</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] w-28">Closes</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] w-20">Closed</span>
+          </div>
+
+          <div class="divide-y divide-[var(--border-glass)]" formArrayName="days">
+            @for (dayGroup of daysArray.controls; track $index) {
+              <div
+                [formGroupName]="$index"
+                class="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3 sm:gap-4 items-center px-4 py-3 transition-colors hover:bg-[var(--bg-secondary)]"
+              >
+                <!-- Day name -->
+                <span
+                  class="text-sm font-semibold text-[var(--text-primary)]"
+                  [class.opacity-50]="dayGroup.controls.isClosed.value"
+                >
+                  {{ dayNames[$index] }}
+                </span>
+
+                <!-- Opens -->
+                <div class="flex items-center gap-2">
+                  <label class="sm:hidden text-xs text-[var(--text-secondary)] w-14">Opens</label>
+                  <input
+                    type="time"
+                    formControlName="openTime"
+                    class="w-28 px-3 py-2 rounded-lg text-sm bg-[var(--bg-secondary)] border text-[var(--text-primary)] outline-none transition-all focus:border-[var(--brand-green)] disabled:opacity-40 disabled:cursor-not-allowed"
+                    [class.border-[var(--border-glass)]]="!isInvalidRange($index)"
+                    [class.border-[var(--brand-red)]]="isInvalidRange($index)"
+                  />
+                </div>
+
+                <!-- Closes -->
+                <div class="flex items-center gap-2">
+                  <label class="sm:hidden text-xs text-[var(--text-secondary)] w-14">Closes</label>
+                  <input
+                    type="time"
+                    formControlName="closeTime"
+                    class="w-28 px-3 py-2 rounded-lg text-sm bg-[var(--bg-secondary)] border text-[var(--text-primary)] outline-none transition-all focus:border-[var(--brand-green)] disabled:opacity-40 disabled:cursor-not-allowed"
+                    [class.border-[var(--border-glass)]]="!isInvalidRange($index)"
+                    [class.border-[var(--brand-red)]]="isInvalidRange($index)"
+                  />
+                </div>
+
+                <!-- Closed all day -->
+                <label
+                  class="flex items-center gap-2 w-20 text-sm text-[var(--text-secondary)] cursor-pointer select-none"
+                >
+                  <input
+                    type="checkbox"
+                    [checked]="dayGroup.controls.isClosed.value"
+                    (change)="onClosedToggle($index, $event)"
+                    class="w-4 h-4 cursor-pointer accent-[var(--brand-green)]"
+                  />
+                  <span class="sm:hidden">Closed</span>
+                </label>
+
+                @if (isInvalidRange($index)) {
+                  <p class="col-span-full m-0 text-xs text-[var(--brand-red)]">
+                    Closing time must be after opening time.
+                  </p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Messages -->
+        @if (errorMessage()) {
+          <div
+            class="mt-4 px-4 py-3 rounded-lg text-sm text-[var(--brand-red)]"
+            style="background: rgba(255, 51, 77, 0.12)"
+          >
+            {{ errorMessage() }}
+          </div>
+        }
+        @if (successMessage()) {
+          <div
+            class="mt-4 px-4 py-3 rounded-lg text-sm text-[var(--brand-green)]"
+            style="background: rgba(8, 184, 128, 0.12)"
+          >
+            {{ successMessage() }}
+          </div>
+        }
+
+        <!-- Save -->
+        <div class="flex items-center justify-end gap-3 mt-6">
+          <button
+            type="submit"
+            [disabled]="isSaving()"
+            class="px-5 py-2.5 rounded-lg text-sm font-semibold border-0 cursor-pointer transition-all text-white hover:shadow-[0_4px_12px_rgba(8,184,128,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+            style="background: var(--accent-gradient)"
+          >
+            {{ isSaving() ? 'Saving...' : 'Save Hours' }}
+          </button>
+        </div>
+      </form>
+    }
+  </main>
+</app-layout>

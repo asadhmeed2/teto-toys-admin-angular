@@ -8,7 +8,7 @@
   HostListener,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
-import { CurrencyPipe, UpperCasePipe } from '@angular/common';
+import { UpperCasePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PermissionsService } from '@shared/services/permissions.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
@@ -32,7 +32,6 @@ import { CategoriesListComponent } from './components/categories-list';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CurrencyPipe,
     UpperCasePipe,
     ConfirmationModalComponent,
     LayoutComponent,

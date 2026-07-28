@@ -46,6 +46,10 @@ export class LayoutComponent {
     this.router.navigate(['/create-subcategory']);
   }
 
+  protected navigateToStoreHours(): void {
+    this.router.navigate(['/store-hours']);
+  }
+
   protected async logout(): Promise<void> {
     this.isLoggingOut.set(true);
     await this.authApiService.logout();
