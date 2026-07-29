@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PermissionsService } from '@shared/services/permissions.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 import { languageScriptValidator } from '@shared/utils/language-script';
+import { debouncedSearch } from '@shared/utils/debounced-search';
 
 import {
   Subcategory,
@@ -377,11 +378,11 @@ export class LandingPageComponent implements OnInit {
     }
   }
 
-  protected onPartsSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
+  /** Debounced — the parts list only reloads once the user stops typing. */
+  protected readonly onPartsSearch = debouncedSearch((value) => {
     this.partsSearch.set(value);
     this.loadParts(true);
-  }
+  });
 
   protected loadMoreParts(event: MouseEvent): void {
     event.preventDefault();
