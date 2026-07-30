@@ -11,13 +11,13 @@ import { FormControl, FormGroup, ReactiveFormsModule, FormArray, Validators } fr
 import { UpperCasePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PermissionsService } from '@shared/services/permissions.service';
+import { CategoriesService } from '@shared/services/categories.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 import { languageScriptValidator } from '@shared/utils/language-script';
 import { debouncedSearch } from '@shared/utils/debounced-search';
 
 import {
   Subcategory,
-  Category,
   CreateProductApiService,
   CreateProductResponse,
   PartDto,
@@ -58,9 +58,12 @@ export class LandingPageComponent implements OnInit {
   protected readonly togglingDisplayProductId = signal<string | null>(null);
   protected readonly restoringProductId = signal<string | null>(null);
 
-  // Category & Subcategory lookup lists
-  protected readonly categories = signal<Category[]>([]);
-  protected readonly categoryMap = signal<Record<number, string>>({});
+  // Category & Subcategory lookup lists.
+  // Categories are owned by CategoriesService so this page and the categories-list
+  // child share one fetch instead of issuing the same request twice.
+  private readonly categoriesService = inject(CategoriesService);
+  protected readonly categories = this.categoriesService.categories;
+  protected readonly categoryMap = this.categoriesService.categoryMap;
   protected readonly subcategories = signal<Subcategory[]>([]);
 
   // Parts list state signals
@@ -200,22 +203,17 @@ export class LandingPageComponent implements OnInit {
     }
   }
 
-  // Load categories and subcategories
+  // Load categories and subcategories.
+  // reload() keeps this page as fresh as it was before the store existed (counts
+  // change whenever products are added/removed), while still collapsing to a
+  // single request with the categories-list child's load().
   private async loadMetadata(): Promise<void> {
     try {
-      const [catsRes, subcatsRes] = await Promise.all([
-        this.productApiService.getCategories(),
+      const [, subcatsRes] = await Promise.all([
+        this.categoriesService.reload(),
         this.productApiService.getSubcategories(),
       ]);
-      const catsList = catsRes.items || [];
-      this.categories.set(catsList);
       this.subcategories.set(subcatsRes.items || []);
-
-      const map: Record<number, string> = {};
-      for (const cat of catsList) {
-        map[cat.id] = cat.name;
-      }
-      this.categoryMap.set(map);
     } catch (err: any) {
       console.error('Failed to load categories/subcategories.', err);
     }
