@@ -17,11 +17,12 @@ export class CreateCategoryApiService {
   private readonly baseUrl = `${API_BASE_URL}/api/admin/categories`;
   private readonly http = inject(HttpClient);
 
-  // ponytail: standard create using Angular HttpClient and async/await
-  async createCategory(name: string): Promise<Category> {
+  // ponytail: standard create using Angular HttpClient and async/await.
+  // `language` decides which category_translations row the name is written to.
+  async createCategory(name: string, language = 'en'): Promise<Category> {
     try {
       return await firstValueFrom(
-        this.http.post<Category>(this.baseUrl, { name }, { withCredentials: true }),
+        this.http.post<Category>(this.baseUrl, { name, language }, { withCredentials: true }),
       );
     } catch (err) {
       throw parseHttpError(err, 'Failed to create category');

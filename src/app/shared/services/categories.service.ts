@@ -11,6 +11,11 @@ export interface AdminCategory {
   number_of_active_products: number;
 }
 
+/** Single-category response; `language` echoes which translation the name came from. */
+export interface AdminCategoryDetail extends AdminCategory {
+  language: string;
+}
+
 export interface AdminCategoriesResponse {
   items: AdminCategory[];
   total_count: number;
@@ -102,6 +107,47 @@ export class CategoriesService {
     })();
 
     return this.inFlight;
+  }
+
+  /**
+   * Single category with its name resolved for `language` (falls back to 'en').
+   * Used by the edit modal, including when the admin switches language mid-edit.
+   */
+  async getCategory(categoryId: number, language = 'en'): Promise<AdminCategoryDetail> {
+    try {
+      const params = new HttpParams().set('language', language);
+      return await firstValueFrom(
+        this.http.get<AdminCategoryDetail>(`${this.baseUrl}/${categoryId}`, {
+          params,
+          withCredentials: true,
+        }),
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to load category');
+    }
+  }
+
+  /** Edits the name for one language. The slug is not editable. */
+  async updateCategory(
+    categoryId: number,
+    name: string,
+    language = 'en',
+  ): Promise<AdminCategoryDetail> {
+    let updated: AdminCategoryDetail;
+    try {
+      updated = await firstValueFrom(
+        this.http.put<AdminCategoryDetail>(
+          `${this.baseUrl}/${categoryId}`,
+          { name, language },
+          { withCredentials: true },
+        ),
+      );
+    } catch (err) {
+      throw parseHttpError(err, 'Failed to update category');
+    }
+    // Refresh so the list and every other consumer show the new name.
+    await this.reload();
+    return updated;
   }
 
   async deleteCategory(categoryId: number): Promise<void> {
