@@ -13,6 +13,7 @@ import { PermissionsService } from '@shared/services/permissions.service';
 })
 export class LayoutComponent {
   protected readonly isMenuOpen = signal(false);
+  protected readonly isUsersMenuOpen = signal(false);
   protected readonly isLoggingOut = signal(false);
 
   // ponytail: exposed so child pages can read permissions from the shared layout
@@ -24,6 +25,12 @@ export class LayoutComponent {
 
   protected toggleMenu(): void {
     this.isMenuOpen.update(open => !open);
+    this.isUsersMenuOpen.set(false);
+  }
+
+  protected toggleUsersMenu(): void {
+    this.isUsersMenuOpen.update(open => !open);
+    this.isMenuOpen.set(false);
   }
 
   protected navigateToCreateUser(): void {
@@ -48,6 +55,14 @@ export class LayoutComponent {
 
   protected navigateToStoreHours(): void {
     this.router.navigate(['/store-hours']);
+  }
+
+  protected navigateToAdminUsers(): void {
+    this.router.navigate(['/admin-users']);
+  }
+
+  protected navigateToUsers(): void {
+    this.router.navigate(['/users']);
   }
 
   protected async logout(): Promise<void> {

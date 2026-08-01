@@ -51,6 +51,21 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    // Admin-only: adminGuard checks the userCreation permission, which is Admin-exclusive.
+    // The API independently enforces this, so a Partner hitting the URL gets a 403 either way.
+    path: 'admin-users',
+    loadComponent: () =>
+      import('./modules/users/components/admin-users-list').then((m) => m.AdminUsersListComponent),
+    canActivate: [authGuard, adminGuard],
+  },
+  {
+    // Admin and Partner; the API sends Partners a reduced projection.
+    path: 'users',
+    loadComponent: () =>
+      import('./modules/users/components/customers-list').then((m) => m.CustomersListComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'store-hours',
     loadComponent: () => import('./modules/store-hours').then((m) => m.StoreHoursComponent),
     canActivate: [authGuard],

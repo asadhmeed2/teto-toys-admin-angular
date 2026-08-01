@@ -1,0 +1,127 @@
+<app-layout>
+  <main class="flex-1 px-6 md:px-10 py-8 max-w-6xl w-full mx-auto">
+    <!-- Heading -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold m-0 text-[var(--text-primary)] [font-family:var(--font-display)]">
+          Admin Users
+        </h1>
+        <p class="mt-1 mb-0 text-sm text-[var(--text-secondary)]">
+          {{ totalCount() }} {{ totalCount() === 1 ? 'account' : 'accounts' }} with dashboard access.
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <input
+          type="text"
+          placeholder="Search name or email..."
+          (input)="onSearchInput($event)"
+          class="w-64 px-3.5 py-2 rounded-lg text-sm bg-[var(--bg-secondary)] border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none transition-all focus:border-[var(--brand-green)]"
+        />
+        <a
+          routerLink="/"
+          class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--border-glass)] no-underline text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-all"
+        >
+          Back
+        </a>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div
+        class="mb-4 px-4 py-3 rounded-lg text-sm text-[var(--brand-red)]"
+        style="background: rgba(255, 51, 77, 0.12)"
+      >
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- Table -->
+    <div class="rounded-xl border border-[var(--border-glass)] overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-[var(--border-glass)] bg-[var(--bg-secondary)]">
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Name</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Email</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Role</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Status</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Created</th>
+              <th class="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Last Login</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border-glass)]">
+            @for (user of users(); track user.admin_id) {
+              <tr class="transition-colors hover:bg-[var(--bg-secondary)]">
+                <td class="px-4 py-3 text-sm font-semibold text-[var(--text-primary)] whitespace-nowrap">
+                  {{ user.first_name }} {{ user.last_name }}
+                </td>
+                <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+                  {{ user.email }}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span
+                    class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider"
+                    [class.text-[var(--brand-green)]]="user.role === 'Admin'"
+                    [class.text-[#f59e0b]]="user.role !== 'Admin'"
+                    [style.background]="
+                      user.role === 'Admin' ? 'rgba(8,184,128,0.12)' : 'rgba(245,158,11,0.12)'
+                    "
+                  >
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap">
+                  <span
+                    [class.text-[var(--brand-green)]]="user.is_active"
+                    [class.text-[var(--text-muted)]]="!user.is_active"
+                  >
+                    {{ user.is_active ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+                  {{ user.created_at ? (user.created_at | date: 'mediumDate') : '—' }}
+                </td>
+                <td class="px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+                  {{ user.last_login ? (user.last_login | date: 'medium') : 'Never' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="px-4 py-12 text-center text-sm text-[var(--text-secondary)]">
+                  @if (isLoading()) {
+                    Loading admin users...
+                  } @else {
+                    No admin users found.
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-4 mt-6">
+        <button
+          [disabled]="page() === 1"
+          (click)="changePage(-1)"
+          class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <span class="text-sm text-[var(--text-secondary)]">
+          Page {{ page() }} of {{ totalPages() }}
+        </span>
+        <button
+          [disabled]="page() === totalPages()"
+          (click)="changePage(1)"
+          class="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+    }
+  </main>
+</app-layout>
