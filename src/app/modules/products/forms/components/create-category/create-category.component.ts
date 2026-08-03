@@ -33,7 +33,6 @@ export class CreateCategoryComponent implements OnInit {
   // Language selector — the name is stored per language, same as products.
   protected readonly languages = signal<SystemLanguage[]>([]);
   protected readonly selectedLanguage = signal<SystemLanguage | null>(null);
-  protected readonly langMenuOpen = signal(false);
 
   constructor() {
     this.categoryForm.controls.name.addValidators(
@@ -49,25 +48,6 @@ export class CreateCategoryComponent implements OnInit {
     } catch {
       // Non-fatal: falls back to 'en' on submit.
     }
-  }
-
-  @HostListener('document:click', ['$event'])
-  protected onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('#create-category-lang-wrapper')) {
-      this.langMenuOpen.set(false);
-    }
-  }
-
-  protected toggleLangMenu(): void {
-    this.langMenuOpen.update((open) => !open);
-  }
-
-  protected selectLanguage(lang: SystemLanguage): void {
-    this.selectedLanguage.set(lang);
-    this.langMenuOpen.set(false);
-    // Re-run the script check against the newly selected language.
-    this.categoryForm.controls.name.updateValueAndValidity();
   }
 
   // ponytail: Category submission handler utilizing async/await and signals
