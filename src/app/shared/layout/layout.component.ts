@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@shared/services/auth.service';
 import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
@@ -22,6 +22,32 @@ export class LayoutComponent {
   private readonly authService = inject(AuthService);
   private readonly authApiService = inject(AdminAuthApiService);
   private readonly router = inject(Router);
+
+  /**
+   * Closes whichever dropdown the click landed outside of.
+   *
+   * The toggle buttons live inside their own wrapper, so a click on one still
+   * matches closest() and the menu it just opened is left alone — no need to
+   * stopPropagation on the toggles.
+   */
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('#create-menu-wrapper')) {
+      this.isMenuOpen.set(false);
+    }
+    if (!target.closest('#users-menu-wrapper')) {
+      this.isUsersMenuOpen.set(false);
+    }
+  }
+
+  /** Escape closes both, matching the dropdowns elsewhere in the app. */
+  @HostListener('document:keydown.escape')
+  protected onEscape(): void {
+    this.isMenuOpen.set(false);
+    this.isUsersMenuOpen.set(false);
+  }
 
   protected toggleMenu(): void {
     this.isMenuOpen.update(open => !open);

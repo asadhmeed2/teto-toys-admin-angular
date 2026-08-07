@@ -14,7 +14,7 @@
     <div class="flex items-center gap-3">
 
       <!-- Create New dropdown -->
-      <div class="relative">
+      <div id="create-menu-wrapper" class="relative">
         <button (click)="toggleMenu()" aria-label="Toggle creation menu"
           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border-0 cursor-pointer transition-all text-white hover:shadow-[0_4px_12px_rgba(8,184,128,0.3)]"
           style="background: var(--accent-gradient);">
@@ -73,7 +73,7 @@
       </div>
 
       <!-- Users dropdown -->
-      <div class="relative">
+      <div id="users-menu-wrapper" class="relative">
         <button (click)="toggleUsersMenu()" aria-label="Toggle users menu"
           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border border-[var(--border-glass)] bg-transparent cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--brand-green)] hover:border-[rgba(8,184,128,0.3)] transition-all">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
