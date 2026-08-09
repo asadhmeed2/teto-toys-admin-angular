@@ -23,6 +23,8 @@ export class LoginPageComponent {
   });
 
   protected readonly isLoading = signal(false);
+  protected readonly loggedIn = signal(false);
+
   protected readonly isPasswordVisible = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
@@ -45,6 +47,8 @@ export class LoginPageComponent {
       const { email, password } = this.form.getRawValue();
       const res = await this.apiService.login(email, password);
       this.authService.setToken(res.access_token, res.expires_in);
+      this.loggedIn.set(true);
+
       this.router.navigate(['']);
     } catch (err: any) {
       this.errorMessage.set(err.message || 'An error occurred. Please try again.');
