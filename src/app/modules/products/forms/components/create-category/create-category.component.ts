@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UpperCasePipe } from '@angular/common';
+
 import { Router, RouterLink } from '@angular/router';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -9,7 +9,7 @@ import { CreateCategoryApiService } from './services/create-category-api.service
 
 @Component({
   selector: 'app-create-category',
-  imports: [ReactiveFormsModule, RouterLink, UpperCasePipe],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './create-category.component.html',
   styleUrl: './create-category.component.scss',
 })
