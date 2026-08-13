@@ -15,6 +15,7 @@ import { CategoriesService } from '@shared/services/categories.service';
 import { LanguageApiService, SystemLanguage } from '@shared/services/language-api.service';
 import { languageScriptValidator } from '@shared/utils/language-script';
 import { debouncedSearch } from '@shared/utils/debounced-search';
+import { ImageListReorder } from '@shared/utils/image-reorder';
 
 import {
   Subcategory,
@@ -342,6 +343,12 @@ export class LandingPageComponent implements OnInit {
   get imageUrlsArray(): FormArray<FormControl<string>> {
     return this.editForm.get('imageUrls') as FormArray<FormControl<string>>;
   }
+
+  /**
+   * Image order is the array order — index 0 is the storefront thumbnail — so
+   * reordering here is all that's needed; no schema or API change.
+   */
+  protected readonly imageOrder = new ImageListReorder(() => this.imageUrlsArray);
 
   protected addImageUrl(): void {
     this.imageUrlsArray.push(new FormControl('', { nonNullable: true }));
