@@ -1,6 +1,7 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '@shared/services/auth.service';
+import { PermissionsService } from '@shared/services/permissions.service';
 import { AdminAuthApiService } from '@modules/auth/services/admin-auth-api.service';
 import { BehaviorSubject, throwError, from, EMPTY } from 'rxjs';
 import { catchError, filter, switchMap, take, finalize } from 'rxjs/operators';
@@ -14,6 +15,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const authApiService = inject(AdminAuthApiService);
   const router = inject(Router);
+  const permissionsService = inject(PermissionsService);
 
   const token = authService.token();
   if (token) {
@@ -28,7 +30,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         !req.url.includes('/api/auth/login') &&
         !req.url.includes('/api/auth/refresh')
       ) {
-        return handle401Error(req, next, authService, authApiService, router);
+        return handle401Error(req, next, authService, authApiService, router, permissionsService);
       }
       return throwError(() => error);
     })
@@ -45,6 +47,7 @@ function handle401Error(
   authService: AuthService,
   authApiService: AdminAuthApiService,
   router: Router,
+  permissionsService: PermissionsService,
 ) {
   if (!authService.isRefreshing) {
     // Mark refresh in progress — blocks both this path and the proactive timer
@@ -60,6 +63,8 @@ function handle401Error(
       catchError((err) => {
         // Refresh token is invalid/expired → real logout
         authService.clearToken();
+        // Drop cached permissions too, or the next user to log in inherits this user's adminGuard result.
+        permissionsService.clearPermissions();
         router.navigate(['/login']);
         return throwError(() => err);
       }),
