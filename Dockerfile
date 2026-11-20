@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build the production bundle, then serve it as static files — never ship the Angular dev server.
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
